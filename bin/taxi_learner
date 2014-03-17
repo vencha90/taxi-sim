@@ -1,0 +1,10 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+
+if ARGV.first.downcase.strip == 'help'
+  puts "please have a look at README"
+else
+  # start up the main class
+  require './lib/taxi_learner.rb'
+  TaxiLearner.new(ARGV)
+end

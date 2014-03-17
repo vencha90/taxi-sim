@@ -4,12 +4,12 @@ describe TaxiLearner do
     subject { TaxiLearner }
     context 'fails' do
       it 'without any params' do
-        expect(subject.new).to raise_error
+        expect{ subject.new }.to raise_error
       end
 
       it 'with an invalid file path' do
-        ARGV[0] = 'no/file/here' 
-        expect(subject.new(ARGV)).to raise_error
+        ARGV[0] = 'no/file/here'
+        expect{ subject.new(ARGV) }.to raise_error
       end
     end
 
