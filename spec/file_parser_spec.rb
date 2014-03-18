@@ -12,9 +12,17 @@ describe TaxiLearner::FileParser do
         expect{ subject.new('/no/file/here') }.to raise_error Errno::ENOENT
       end
     end
+    context 'with a bad input file' do
+      subject { TaxiLearner::FileParser.new('spec/fixtures/bad_input.yml') }
+      
+      it 'checks the required variables' do
+        expect{ subject }
+          .to raise_error ArgumentError, "'graph' not found in input file"
+      end
+    end
   end
 
-  context 'with a correct filename' do
+  context 'with a correct input file' do
     subject { TaxiLearner::FileParser.new('spec/fixtures/input.yml') }
 
     describe '#graph_adjacency_matrix' do
