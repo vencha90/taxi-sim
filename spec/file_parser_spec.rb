@@ -32,4 +32,15 @@ describe TaxiLearner::FileParser do
       end
     end
   end
+
+  describe '.graph_adjacency_matrix' do
+    subject { TaxiLearner::FileParser }
+
+    context 'with incorrect input matrix' do
+      it 'raises error' do
+        expect{ subject.graph_adjacency_matrix('graph' => 'a')
+          }.to raise_error ArgumentError, 'bad input graph matrix'
+      end
+    end
+  end
 end

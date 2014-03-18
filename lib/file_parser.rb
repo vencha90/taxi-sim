@@ -14,8 +14,13 @@ module TaxiLearner
     end
 
     def graph_adjacency_matrix
-      matrix = @yaml['graph']
-      matrix.map! do |row|        
+      self.class.graph_adjacency_matrix(@yaml)
+    end
+
+    def self.graph_adjacency_matrix(yaml)
+      matrix = yaml['graph']
+      raise ArgumentError, "bad input graph matrix" unless matrix.respond_to?(:map)
+      matrix.map!.with_index do |row, index|
         row.split(',').map! { |item| item.to_i }
       end
       matrix
