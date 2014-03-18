@@ -1,3 +1,5 @@
+require 'plexus'
+
 describe TaxiLearner::Graph::Base do
   subject { TaxiLearner::Graph::Base }
 
@@ -14,6 +16,15 @@ describe TaxiLearner::Graph::Base do
   end
 
   context 'with correct input adjacency matrix' do
-    it 'parses adjacency matrix correctly'
+    it 'parses adjacency matrix correctly' do
+      matrix = [[0, 1, 2], #directed weighted graph
+                [1, 0, 1], #the self-loop in final row should be ignored
+                [0, 1, 1]]
+      graph = Plexus::Digraph.new()
+      graph.add_edge!(1,2,1).add_edge!(1,3,2).add_edge!(2,1,1).add_edge!(2,3,1)
+        .add_edge!(3,2,1)
+      expect(subject.new(matrix).graph
+        ).to eq(graph)
+    end
   end
 end
