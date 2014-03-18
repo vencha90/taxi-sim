@@ -1,19 +1,21 @@
 require 'rubygems'
 require 'bundler/setup'
 require 'require_all'
+require 'yaml'
 
 require_all 'lib'
 
-class TaxiLearner
-  attr_reader :file
+module TaxiLearner
+  class Runner
+    attr_reader :yaml, :graph
 
-  def initialize(argv)
-    @file = parse_file(ARGV.first)
-  end
+    def initialize(args = nil)
+      raise(ArgumentError, 'please specify a file for input') if args.nil?
+      parser = TaxiLearner::FileParser.new(args.first)
+      @yaml = parser.graph_adjacency_matrix
+    end
 
-private
+  private
 
-  def parse_file(path)
-    path
   end
 end
