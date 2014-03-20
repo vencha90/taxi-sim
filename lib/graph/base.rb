@@ -26,7 +26,7 @@ module TaxiLearner
         matrix_length = matrix.length
         e = -> { raise ArgumentError, "bad matrix dimensions: #{matrix.to_s}" }
         e.call if matrix_length < 1
-        graph = Plexus::Digraph.new
+        graph = Plexus::UndirectedGraph.new
         matrix.each.with_index do |row, row_index|
           e.call unless row.length == matrix_length
           row.each.with_index do |column, column_index|
