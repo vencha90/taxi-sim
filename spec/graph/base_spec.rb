@@ -13,6 +13,12 @@ describe TaxiLearner::Graph::Base do
       expect{ subject.new([[1],[1,2]])
         }.to raise_error ArgumentError, 'bad matrix dimensions: [[1], [1, 2]]'
     end
+
+    it 'ignores self loops' do
+      internal_graph = Plexus::Digraph.new
+      internal_graph.add_edge!(1,2,1).add_edge!(2,1,1)
+      expect(subject.new([[1,1],[1,1]]).graph).to eq(internal_graph)
+    end
   end
 
   context 'with correct input adjacency matrix' do
