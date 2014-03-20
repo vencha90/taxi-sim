@@ -8,20 +8,14 @@ describe TaxiLearner::Runner do
 
   context 'with a correct input file' do
     subject { TaxiLearner::Runner.new(['spec/fixtures/input.yml']) }
-
-    it 'parses the input file' do
-      fixture_array = [[0, 1, 2], [1, 0, 2], [2, 2, 0]]
-      expect(subject.yaml).to eq(fixture_array)
-      pending 'remove this temp test'
-    end
-
-    it 'creates a graph' do
-      pending 'using the input'
-      expect(subject.graph).to eq(TaxiLearner::Graph::Base.new)
+    let(:fixture_matrix) { fixture_matrix = [[0, 1, 2], [1, 0, 2], [2, 2, 0]] }
+    let(:fixture_graph) do
+      g = Plexus::UndirectedGraph.new()
+      g.add_edge!(1,2,1).add_edge!(1,3,2).add_edge!(2,3,2)
     end
 
     it 'creates a world' do
-      pending 'using the graph'
+      expect(subject.world.graph.graph).to eq(fixture_graph)
     end
 
     it 'runs a simulation'

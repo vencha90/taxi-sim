@@ -7,12 +7,13 @@ require_all 'lib'
 
 module TaxiLearner
   class Runner
-    attr_reader :yaml, :graph
+    attr_reader :world
 
     def initialize(args = nil)
       raise(ArgumentError, 'please specify a file for input') if args.nil?
       parser = TaxiLearner::FileParser.new(args.first)
-      @yaml = parser.graph_adjacency_matrix
+      graph = TaxiLearner::Graph::Base.new(parser.graph_adjacency_matrix)
+      @world = TaxiLearner::World.new(graph)
     end
 
   private
