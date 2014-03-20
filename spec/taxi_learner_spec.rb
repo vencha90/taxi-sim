@@ -11,7 +11,10 @@ describe TaxiLearner::Runner do
     let(:fixture_matrix) { fixture_matrix = [[0, 1, 2], [1, 0, 2], [2, 2, 0]] }
     let(:fixture_graph) do
       g = Plexus::UndirectedGraph.new()
-      g.add_edge!(1,2,1).add_edge!(1,3,2).add_edge!(2,3,2)
+      v1 = TaxiLearner::Graph::Vertex.new(1)
+      v2 = TaxiLearner::Graph::Vertex.new(2)
+      v3 = TaxiLearner::Graph::Vertex.new(3)
+      g.add_edge!(v1,v2,1).add_edge!(v1,v3,2).add_edge!(v2,v3,2)
     end
 
     it 'creates a world' do
