@@ -16,6 +16,15 @@ describe TaxiLearner::Graph::Base do
         }.to raise_error ArgumentError, 'bad matrix dimensions: [[1], [1, 2]]'
     end
 
+    it 'raises error if graph is not connected' do
+      pending 'not implemented in plexus'
+      expect{ subject.new([[0,1,0,0],
+                           [1,0,0,0],
+                           [0,0,0,1],
+                           [0,0,1,0]]) 
+        }.to raise_error ArgumentError, 'input matrix graph is not connected'
+    end
+
     it 'ignores self loops' do
       expect(subject.new([[1,0],[0,0]]).graph).to eq(internal_graph)
     end

@@ -35,6 +35,7 @@ module TaxiLearner
             graph.add_edge!(row_index + 1, column_index + 1, column)
           end
         end
+        raise ArgumentError, 'input matrix graph is not connected' unless graph.connected?
         graph
       end
     end
