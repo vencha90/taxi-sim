@@ -9,6 +9,18 @@ module TaxiLearner
         @graph = initialize_graph(matrix)
       end
 
+      def path_weight(start, finish)
+        proc = Proc.new { |vertex| 0 }
+        path = @graph.astar(start, finish, proc, {})
+        weight = 0
+        path.each.with_index do |vertex, index|
+          break if index == path.length - 1
+          next_vertex = path[index + 1]
+          weight += @graph.edge_label(vertex, next_vertex)
+        end
+        weight
+      end
+
     private 
       def initialize_graph(matrix)
         matrix_length = matrix.length
