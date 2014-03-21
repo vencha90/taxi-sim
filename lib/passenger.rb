@@ -2,7 +2,7 @@ module TaxiLearner
   class Passenger
     attr_reader :destination, :location, :price, :world, :characteristics
 
-    def initialize(world:, location:, price:, characteristics: [])
+    def initialize(world:, location: nil, price: 0, characteristics: [])
       @world = world
       @location = location
       @destination = world.graph.random_vertex
