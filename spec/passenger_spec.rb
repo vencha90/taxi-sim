@@ -1,14 +1,15 @@
 require 'plexus'
 
 describe TaxiLearner::Passenger do
-  describe 'initialisation' do
-    subject { TaxiLearner::Passenger }
+  let(:graph) { double(random_vertex: 'some_vertex') }
+  let(:world) { double(graph: graph) }
+  subject { TaxiLearner::Passenger.new(world) }
 
+  describe 'initialisation' do
     it 'has a set of characteristics'
 
-    it 'has a randomly chosen destination' do
-      pending 'needs a vertex implementation first'
-      expect(subject.new.destination).to be_a_kind_of(TaxiLearner::Graph::Vertex)
+    it 'has a randomly chosen destination from the world' do
+      expect(subject.destination).to eq('some_vertex')
     end
   end
 

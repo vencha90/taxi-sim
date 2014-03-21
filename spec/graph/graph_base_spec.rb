@@ -1,4 +1,3 @@
-require 'plexus'
 include TaxiLearner::Graph
 
 describe Base do
@@ -61,14 +60,23 @@ describe Base do
       expect(subject.find_vertex_by_label(1)).to eq(v1)
       expect(subject.find_vertex_by_label(3)).to eq(v3)
     end
+
+    it 'returns nil if not found' do
+      expect(subject.find_vertex_by_label('none')).to be_nil
+    end
   end
 
   describe '#path_weight' do
-
     it 'returns a weight for the shortest path' do
       expect(subject.path_weight(1,2)).to eq(1)
       expect(subject.path_weight(1,3)).to eq(2)
       expect(subject.path_weight(3,1)).to eq(2)
+    end
+  end
+
+  describe '#random_vertex' do
+    it 'returns a randomly chosen vertex' do
+      expect(subject.graph.vertices).to include(subject.random_vertex)
     end
   end
 end

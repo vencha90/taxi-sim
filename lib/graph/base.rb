@@ -30,6 +30,10 @@ module TaxiLearner
         weight
       end
 
+      def random_vertex
+        @graph.vertices.sample
+      end
+
     private 
       def initialize_graph(matrix)
         matrix_length = matrix.length
