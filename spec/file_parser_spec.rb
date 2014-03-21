@@ -12,20 +12,19 @@ describe TaxiLearner::FileParser do
         expect{ subject.new('/no/file/here') }.to raise_error Errno::ENOENT
       end
     end
-    context 'with a bad input file' do      
-      it 'checks that graph is included' do
-        expect{ subject.new('spec/fixtures/bad_input.yml') }
-          .to raise_error ArgumentError, "'graph' not found in input file"
-      end
-    end
   end
 
   context 'with a correct input file' do
     subject { TaxiLearner::FileParser.new('spec/fixtures/input.yml') }
 
     describe '#graph_adjacency_matrix' do
-      context 'with incorrect input matrix' do
-        it 'raises error' do
+      context 'with incorrect input' do
+        it 'raises error on missing top level key' do
+          expect{ subject.graph_adjacency_matrix('aaa' => 'aaa') }
+            .to raise_error ArgumentError, "no input graph"
+        end
+
+        it 'raises error unless a matrix is provided' do
           expect{ subject.graph_adjacency_matrix('graph' => 'a')
             }.to raise_error ArgumentError, 'bad input graph matrix'
         end
@@ -37,14 +36,37 @@ describe TaxiLearner::FileParser do
         expect(subject.graph_adjacency_matrix(yaml)).to eq fixture_array
       end
 
-      it 'uses the file by default' do
+      it 'uses the input file by default' do
         fixture_array = [[0, 1, 2], [1, 0, 2], [2, 2, 0]]
         expect(subject.graph_adjacency_matrix).to eq fixture_array
       end
     end
 
     describe '#passenger' do
-      it 'parses passenger yaml correctly'
+      context 'with incorrect input matrix' do
+        it 'raises error on missing top level key' do
+          expect{ subject.passenger('aaa' => 'bbb')
+            }.to raise_error ArgumentError, 'no input passenger details'
+        end
+
+        it 'raises error on missing price per distance' do
+          passenger_hash = { 'aaa' => 'bbb' }
+          expect{ subject.passenger({'passenger' => passenger_hash})
+            }.to raise_error ArgumentError, 'no input passenger expected price'
+        end
+
+        it 'raises error on missing more params'
+      end
+
+      it 'parses passenger yaml correctly' do
+        passenger_hash = { 'price' => '33' }
+        expect(subject.passenger({ 'passenger' => passenger_hash })
+          ).to eq(price: 33)
+      end
+
+      it 'uses the input file by default' do
+        expect(subject.passenger).to eq(price: 12)
+      end
     end
 
     describe '#taxi' do
