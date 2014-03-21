@@ -44,7 +44,18 @@ describe Passenger do
   end
 
   describe '#accept_fare?' do
-    it 'is true if probability high'
-    it 'is false if probability low'
+    subject { Passenger.new(world: world) }
+    before do
+      subject.stub(:expected_fare).and_return(5)
+      subject.stub(:probabilistic_value).and_return(0.5) # ==> Q = 2.5
+    end
+
+    it 'is true if offered fare too low' do
+      expect(subject.accept_fare?(2.4)).to be_true
+    end
+
+    it 'is false if offered fare too high' do
+      expect(subject.accept_fare?(2.6)).to be_false
+    end
   end
 end

@@ -28,5 +28,9 @@ module TaxiLearner
       end
       sum
     end
+
+    def accept_fare?(fare)
+      1 < ((self.expected_fare * self.probabilistic_value) / fare )
+    end
   end
 end
