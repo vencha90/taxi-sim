@@ -1,9 +1,9 @@
-describe TaxiLearner::Taxi do
+describe Taxi do
   describe 'initialisation' do
     it { should_not be_busy }
 
     context 'assignments' do
-      subject { TaxiLearner::Taxi }
+      subject { Taxi }
       describe 'fixed cost' do
         it 'is being set' do
           expect(subject.new(fc: 11).fc).to eq(11) 

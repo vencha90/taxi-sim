@@ -1,6 +1,6 @@
-describe TaxiLearner::FileParser do
+describe FileParser do
   context 'fails' do
-    subject { TaxiLearner::FileParser }
+    subject { FileParser }
 
     context 'with no args' do
       it 'raises argument error' do
@@ -15,7 +15,7 @@ describe TaxiLearner::FileParser do
   end
 
   context 'with a correct input file' do
-    subject { TaxiLearner::FileParser.new('spec/fixtures/input.yml') }
+    subject { FileParser.new('spec/fixtures/input.yml') }
 
     describe '#graph_adjacency_matrix' do
       context 'with incorrect input' do

@@ -1,6 +1,4 @@
-require 'plexus'
-
-describe TaxiLearner::Passenger do
+describe Passenger do
   let(:graph) { double(random_vertex: 'destination_vertex') }
   let(:world) { double(graph: graph) }
   let(:characteristic) { double(weight: 0.5, normalised_value: 0.9) }

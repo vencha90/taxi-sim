@@ -1,5 +1,5 @@
-describe TaxiLearner::World do
-  subject { TaxiLearner::World.new('graph') }
+describe World do
+  subject { World.new('graph') }
 
   it 'assigns graph' do
     expect(subject.graph).to eq('graph')

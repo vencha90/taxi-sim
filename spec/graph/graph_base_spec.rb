@@ -1,4 +1,4 @@
-include TaxiLearner::Graph
+include Graph
 
 describe Base do
   subject { Base.new([[0, 1, 2],
