@@ -30,6 +30,8 @@ module TaxiLearner
         weight
       end
 
+      alias :distance :path_weight
+
       def random_vertex
         @graph.vertices.sample
       end

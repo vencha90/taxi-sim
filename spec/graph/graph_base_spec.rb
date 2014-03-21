@@ -67,6 +67,10 @@ describe Base do
   end
 
   describe '#path_weight' do
+    it 'is aliased as #distance' do
+      expect(subject.method(:path_weight)).to eq(subject.method(:distance))
+    end
+
     it 'returns a weight for the shortest path' do
       expect(subject.path_weight(1,2)).to eq(1)
       expect(subject.path_weight(1,3)).to eq(2)
