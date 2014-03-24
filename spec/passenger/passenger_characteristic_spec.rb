@@ -1,5 +1,5 @@
-describe PassengerCharacteristic do
-  subject { PassengerCharacteristic }
+describe Passenger::Characteristic do
+  subject { Passenger::Characteristic }
 
   describe 'initialisation' do
     it 'sets weight' do

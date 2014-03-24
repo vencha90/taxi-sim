@@ -1,5 +1,5 @@
 module TaxiLearner
-  module Graph
+  class Graph
     class Vertex
       attr_reader :label, :passenger_probability
       alias_method :to_s, :label

@@ -1,12 +1,10 @@
-include Graph
-
-describe Base do
-  subject { Base.new([[0, 1, 2],
+describe Graph do
+  subject { Graph.new([[0, 1, 2],
                       [0, 0, 1],
                       [0, 0, 0]]) }
 
   describe 'initialisation' do
-    subject { Base }
+    subject { Graph }
     let(:internal_graph) { Plexus::UndirectedGraph.new() }
 
     it 'raises error on bad empty matrix' do
@@ -42,9 +40,9 @@ describe Base do
         matrix = [[0, 0, 0],
                   [1, 0, 1],
                   [2, 0, 0]]
-        v1 = Vertex.new(1)
-        v2 = Vertex.new(2)
-        v3 = Vertex.new(3)
+        v1 = Graph::Vertex.new(1)
+        v2 = Graph::Vertex.new(2)
+        v3 = Graph::Vertex.new(3)
         internal_graph.add_edge!(v1,v2,1)
                       .add_edge!(v1,v3,2)
                       .add_edge!(v2,v3,1)

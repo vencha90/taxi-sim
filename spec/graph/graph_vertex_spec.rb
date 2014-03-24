@@ -1,5 +1,5 @@
-describe Vertex do
-  subject { Vertex.new('some label') }
+describe Graph::Vertex do
+  subject { Graph::Vertex.new('some label') }
 
   describe 'initialisation' do
     it 'sets a label' do
@@ -18,8 +18,8 @@ describe Vertex do
   end
 
   describe '==' do
-    let(:equal_vertex) { Vertex.new('some label') }
-    let(:another_vertex) { Vertex.new('another label') }
+    let(:equal_vertex) { Graph::Vertex.new('some label') }
+    let(:another_vertex) { Graph::Vertex.new('another label') }
 
     it 'compares labels' do
       expect(subject).not_to eq(another_vertex)
