@@ -10,6 +10,11 @@ module TaxiLearner
       @characteristics = characteristics
     end
 
+    def accept_fare?(fare)
+      1 < ((expected_fare * probabilistic_value) / fare )
+    end
+
+  private
     def expected_fare
       distance = @world.graph.distance(@location, @destination)
       distance * price
@@ -27,10 +32,6 @@ module TaxiLearner
         sum += relative_weight * c.normalised_value
       end
       sum
-    end
-
-    def accept_fare?(fare)
-      1 < ((self.expected_fare * self.probabilistic_value) / fare )
     end
   end
 end
