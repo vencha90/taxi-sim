@@ -21,16 +21,28 @@ describe Taxi do
           expect(subject.new.vc).to eq(0)
         end
       end
+
+      describe 'learner' do
+        it 'is instantiated' do
+          expect(Taxi::Learner).to receive(:new)
+          subject.new
+        end
+      end
     end
   end
 
-  describe '#act' do
-    it { should respond_to :act }
-    it 'takes an action'
+  describe '#act!' do
+    let(:learner) { double() }
+    subject { Taxi.new(learner: learner) }
+
+    it 'calls the internal learner to act' do
+      expect(learner).to receive(:act!)
+      subject.act!
+    end
   end
 
-  describe '#tick' do
-    it { should respond_to :tick }
+  describe '#tick!' do
+    it { should respond_to :tick! }
     it 'reduces busy time by 1 if busy'
   end
 end
