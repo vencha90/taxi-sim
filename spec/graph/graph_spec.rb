@@ -2,6 +2,10 @@ describe Graph do
   subject { Graph.new([[0, 1, 2],
                       [0, 0, 1],
                       [0, 0, 0]]) }
+  let(:v1) { Graph::Vertex.new(1) }
+  let(:v2) { Graph::Vertex.new(2) }
+  let(:v3) { Graph::Vertex.new(3) }
+
 
   describe 'initialisation' do
     subject { Graph }
@@ -31,7 +35,7 @@ describe Graph do
     end
 
     it 'does not add duplicate edges' do
-      internal_graph.add_edge!(1,2,1)
+      internal_graph.add_edge!(v1,v2,1)
       expect(subject.new([[0,1],[1,0]]).graph).to eq(internal_graph)
     end
 
@@ -40,9 +44,6 @@ describe Graph do
         matrix = [[0, 0, 0],
                   [1, 0, 1],
                   [2, 0, 0]]
-        v1 = Graph::Vertex.new(1)
-        v2 = Graph::Vertex.new(2)
-        v3 = Graph::Vertex.new(3)
         internal_graph.add_edge!(v1,v2,1)
                       .add_edge!(v1,v3,2)
                       .add_edge!(v2,v3,1)

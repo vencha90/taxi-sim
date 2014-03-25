@@ -10,7 +10,14 @@ module TaxiLearner
       end
 
       def ==(another_vertex)
-        self.to_s == another_vertex.to_s
+        self.class === another_vertex and
+        self.label == another_vertex.label
+      end
+
+      alias eql? ==
+
+      def hash
+        self.label.hash
       end
 
       def <=>(another_vertex)
