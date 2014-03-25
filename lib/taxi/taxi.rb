@@ -2,11 +2,11 @@ module TaxiLearner
   class Taxi
     attr_reader :fc, :vc
 
-    def initialize(fc: 0, vc: 0, learner: nil)
+    def initialize(location:, world:, fc: 1, vc: 1, learner: nil)
       @fc = fc
       @vc = vc
       @busy_for = 0
-      @learner = learner || Taxi::Learner.new
+      @learner = learner || Taxi::Learner.new(state: location, environment: world)
     end
 
     def busy?
