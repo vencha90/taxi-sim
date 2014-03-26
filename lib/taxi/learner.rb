@@ -11,20 +11,33 @@ module TaxiLearner
         @visits = @states.map{ 0 }
 
         @step_size_function = step_size_function || default_step_size_function
-        @value_estimates = value_estimates || default_value_estimates
+        @value_estimates = value_estimates
       end
 
-      def act!
+      def act!(actions)
 
       end
 
-      def update!(new_state, reward) # TD(0)
+      def update!(new_state, new_action, reward) # TD(0)
         delta = reward + 
                 @discount_factor * @value_estimates[new_state] -
                 @value_estimates[@state]
         @value_estimates[@state] += delta * @step_size_function.call(@state)
         @visits[@state] += 1
         @state = new_state
+      end
+
+      def select_action
+        if @value_estimates.nil? || (action_hash = @value_estimates[@state]).nil?
+          raise "no actions available at this agent's state"
+        end
+        prob = @epsilon - rand()
+        if prob >= 0
+          action = action_hash.max_by { |x| x[1] }
+        else
+          action = action_hash.to_a.sample
+        end
+        action[0]
       end
 
     private
@@ -38,10 +51,6 @@ module TaxiLearner
             1.0
           end
         end
-      end
-
-      def default_value_estimates
-        @states.map{ 0.5 }
       end
     end
   end
