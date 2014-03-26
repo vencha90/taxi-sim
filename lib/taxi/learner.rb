@@ -8,7 +8,8 @@ module TaxiLearner
         @discount_factor = discount_factor
         @state = state
         @states = environment
-        @visits = @states.map{ 0 }
+        @visits = @states.map{ |state| [state, Hash.new] }.to_h
+        @epsilon = 0
 
         @step_size_function = step_size_function || default_step_size_function
         @value_estimates = value_estimates
@@ -18,12 +19,19 @@ module TaxiLearner
 
       end
 
-      def update!(new_state, new_action, reward) # TD(0)
+      def update!(action:, new_state:, reward:) # Q-learning basic
         delta = reward + 
-                @discount_factor * @value_estimates[new_state] -
-                @value_estimates[@state]
-        @value_estimates[@state] += delta * @step_size_function.call(@state)
-        @visits[@state] += 1
+              @discount_factor * max_by_value(@value_estimates[new_state])[1] -
+              @value_estimates[@state][action]
+        @value_estimates[@state][action] += 
+              delta * @step_size_function.call(@state, action)
+
+        if @visits[@state][action].nil? 
+          @visits[@state][action] = 1
+        else
+          @visits[@state][action] += 1
+        end
+
         @state = new_state
       end
 
@@ -33,7 +41,7 @@ module TaxiLearner
         end
         prob = @epsilon - rand()
         if prob >= 0
-          action = action_hash.max_by { |x| x[1] }
+          action = max_by_value(action_hash)
         else
           action = action_hash.to_a.sample
         end
@@ -51,6 +59,10 @@ module TaxiLearner
             1.0
           end
         end
+      end
+
+      def max_by_value(hash)
+        hash.max_by { |x| x[1] }
       end
     end
   end

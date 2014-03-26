@@ -1,16 +1,20 @@
 describe Taxi::Learner do
   let(:state) { 2 }
-  let(:environment) { [1, 2, 3, 4] }
+  let(:environment) { [1, 2] }
   let(:min_params) { {state: state, environment: environment} }
   subject { Taxi::Learner.new(min_params)}
 
   describe 'initialisation' do
     it 'instantiates visited states' do
-      expect(subject.visits).to eq([0, 0, 0, 0])
+      expect(subject.visits).to eq(1 => {}, 2 => {})
     end
 
     it 'sets a default discount factor' do
       expect(subject.instance_variable_get '@discount_factor').to eq(0.1)
+    end
+
+    it 'sets epsilon to use random actions' do
+      expect(subject.instance_variable_get '@epsilon').to eq(0)
     end
 
     it 'sets a default step size function' do
@@ -26,21 +30,24 @@ describe Taxi::Learner do
       environment: [0, 1, 2],
       discount_factor: 0.2,
       step_size_function: double(call: 0.5),
-      value_estimates: { 0 => {'action' => 0.5},
+      value_estimates: { 0 => {'action' => 0.5, 'other_action' => 1.0},
                          1 => {'action' => 0.5},
                          2 => {'action' => 0.5} }
     )}
 
-    let(:update!) { subject.update!(2, 0.5) }
+    let(:update!) { 
+      subject.update!(action: 'action', new_state: 2, reward: 0.5) }
 
     it 'updates value estimates correctly' do
-      expect{ update! 
-        }.to change{ subject.value_estimates[0]['action'] }.from(0.3)
-        .to be_within(0.000001).of(0.43)
+      expect{ update!
+        }.to change{ subject.value_estimates[0]['action'] }.from(0.5)
+        .to be_within(0.000001).of(0.55)
     end
 
     it 'updates visits of old state' do
-      expect{ update! }.to change{ subject.visits[0] }.from(0).to(1)
+      puts subject.visits
+      expect{ update! 
+        }.to change{ subject.visits[0]['action'] }.to(1)
     end
 
     it 'sets old state to new state' do
