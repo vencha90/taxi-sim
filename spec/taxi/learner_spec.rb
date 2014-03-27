@@ -1,7 +1,10 @@
 describe Taxi::Learner do
   let(:state) { 2 }
   let(:environment) { [1, 2] }
-  let(:min_params) { {state: state, environment: environment} }
+  let(:available_actions) { ['action'] }
+  let(:min_params) { {state: state,
+                      environment: environment,
+                      available_actions: available_actions} }
   subject { Taxi::Learner.new(min_params)}
 
   describe 'initialisation' do
@@ -17,11 +20,15 @@ describe Taxi::Learner do
       expect(subject.instance_variable_get '@epsilon').to eq(0)
     end
 
+    it 'sets default value estimates for available actions' do
+      expect(subject.value_estimates).to eq(2 => {'action' => 100})
+    end
+
     it 'sets a default step size function' do
-      subject.instance_variable_set('@visits', [0, 2])
+      subject.instance_variable_set('@visits', {0 => {0 => 0}, 2 => {2 => 2}})
       function = subject.instance_variable_get('@step_size_function')
-      expect(function.call 1).to eq(0.5)
-      expect(function.call 0).to eq(1)
+      expect(function.call 2, 2).to eq(0.5)
+      expect(function.call 0, 0).to eq(1)
     end
   end
 
@@ -32,7 +39,8 @@ describe Taxi::Learner do
       step_size_function: double(call: 0.5),
       value_estimates: { 0 => {'action' => 0.5, 'other_action' => 1.0},
                          1 => {'action' => 0.5},
-                         2 => {'action' => 0.5} }
+                         2 => {'action' => 0.5} },
+      available_actions: ['action']
     )}
 
     let(:update!) { 
@@ -45,7 +53,6 @@ describe Taxi::Learner do
     end
 
     it 'updates visits of old state' do
-      puts subject.visits
       expect{ update! 
         }.to change{ subject.visits[0]['action'] }.to(1)
     end
@@ -56,37 +63,51 @@ describe Taxi::Learner do
   end
 
   describe '#act!' do
-    it 'sets high default value estimates for new actions' do
-      expect{ subject.act!(['action']) 
-        }.to change{ subject.instance_variable_get('@value_estimates')
-        }.from({}).to({ state => {'action' => 100 }})
+    let(:act!) { subject.act!(available_actions: ['action'],
+                              new_state: 'new state',
+                              reward: 123) }
+
+    it 'sets default value estimates for the next state' do
+      allow(subject).to receive(:update!).and_return(nil)
+      subject.instance_variable_set('@value_estimates', state => {'a' => 1} )
+      expect{ act! 
+        }.to change{ subject.value_estimates['new state'] }
+         .from(nil)
+         .to eq('action' => 100)
     end
 
     it 'chooses an action' do
-      expect(subject).to receive(:select_action).with(['action'])
-      subject.act!(['action'])
+      allow(subject).to receive(:update!)
+      expect(subject).to receive(:select_action)
+      act!
     end
 
-    it 'raises error if no actions available' do
-      subject.instance_variable_set('@state', 1)
-      subject.instance_variable_set('@value_estimates', { 1 => {'some_action' => 1} })
+    it 'updates the learner' do
+      allow(subject).to receive(:select_action).and_return('selected')
+      expect(subject).to receive(:update!)
+        .with(action: 'selected', new_state: 'new state', reward: 123)
+      act!
+    end
+
+    it 'receives new state and reward and does stuff with it' do
+
     end
   end
 
   describe '#select_action' do
-    it 'raises error when no actions available' do
-      expect{ subject.select_action([])
-        }.to raise_error RuntimeError, "no actions available at this agent's state"
-    end
-
     context 'exploration strategy' do
       subject { Taxi::Learner.new(min_params.merge(
         value_estimates: { state => {'action' => 10,
-                                     'other_action' => 0,
-                                     'unavailable_action' => 10}} 
+                                     'other_action' => 0}} 
       ))}
 
-      let(:select_action) { subject.select_action(['action', 'other_action']) }
+      let(:select_action) { subject.select_action }
+
+      it 'raises error when no actions available' do
+        min_params[:available_actions] = []
+        expect{ Taxi::Learner.new(min_params).select_action
+          }.to raise_error RuntimeError, "no actions available at this agent's state"
+      end
 
       it 'selects the greedy action with large epsilon' do
         subject.instance_variable_set('@epsilon', 1)
@@ -96,11 +117,6 @@ describe Taxi::Learner do
       it 'selects a random action with small epsilon' do
         subject.instance_variable_set('@epsilon', 0)
         expect(['action', 'other_action']).to include(select_action)
-      end
-
-      it 'never selects the unavailable action' do
-        subject.instance_variable_set('@epsilon', 0)
-        expect(select_action).to_not eq('unavailable_action')
       end
     end
   end
