@@ -56,20 +56,15 @@ describe Taxi::Learner do
   end
 
   describe '#act!' do
-    it { should respond_to :act! }
-
     it 'sets high default value estimates for new actions' do
       expect{ subject.act!(['action']) 
-        }.to change(subject.instance_variable_get '@value_estimates'
-        ).from(nil).to({ state => {'some_action' => 100 }})
+        }.to change{ subject.instance_variable_get('@value_estimates')
+        }.from({}).to({ state => {'action' => 100 }})
     end
 
     it 'chooses an action' do
-      subject.instance_variable_set('@state', 1)
-      subject.instance_variable_set('@value_estimates', { 
-        1 => {'action' => 1, 'other_action' => 2} })
-      expect(subject).to receive(:select_action)
-      expect(subject.act!(['action', 'other_action'])).to eq('other_action')
+      expect(subject).to receive(:select_action).with(['action'])
+      subject.act!(['action'])
     end
 
     it 'raises error if no actions available' do
@@ -80,22 +75,32 @@ describe Taxi::Learner do
 
   describe '#select_action' do
     it 'raises error when no actions available' do
-      expect{ subject.select_action 
+      expect{ subject.select_action([])
         }.to raise_error RuntimeError, "no actions available at this agent's state"
     end
 
     context 'exploration strategy' do
       subject { Taxi::Learner.new(min_params.merge(
-        value_estimates: { state => {'action' => 10, 'other_action' => 0}} ))}
+        value_estimates: { state => {'action' => 10,
+                                     'other_action' => 0,
+                                     'unavailable_action' => 10}} 
+      ))}
+
+      let(:select_action) { subject.select_action(['action', 'other_action']) }
 
       it 'selects the greedy action with large epsilon' do
         subject.instance_variable_set('@epsilon', 1)
-        expect(subject.select_action).to eq('action')
+        expect(select_action).to eq('action')
       end
 
       it 'selects a random action with small epsilon' do
         subject.instance_variable_set('@epsilon', 0)
-        expect(['action', 'other_action']).to include(subject.select_action)
+        expect(['action', 'other_action']).to include(select_action)
+      end
+
+      it 'never selects the unavailable action' do
+        subject.instance_variable_set('@epsilon', 0)
+        expect(select_action).to_not eq('unavailable_action')
       end
     end
   end
