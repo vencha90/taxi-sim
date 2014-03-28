@@ -88,10 +88,6 @@ describe Taxi::Learner do
         .with(action: 'selected', new_state: 'new state', reward: 123)
       act!
     end
-
-    it 'receives new state and reward and does stuff with it' do
-
-    end
   end
 
   describe '#select_action' do

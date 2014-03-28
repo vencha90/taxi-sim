@@ -1,0 +1,18 @@
+module TaxiLearner
+  class Taxi
+    class Action
+      attr_reader :type, :value
+
+      def initialize(type, value = nil)
+        @type = type
+        @value = value
+      end
+
+      def == (other)
+        @type == other.type && @value == other.value
+      end
+
+      alias eql? == 
+    end
+  end
+end

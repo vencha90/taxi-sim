@@ -17,4 +17,17 @@ describe World do
     it 'calls actors to act'
     it 'executes actions'
   end
+
+  describe '#reachable_destinations' do
+    subject { World.new(double(vertices: 'all vertices')) }
+
+    it 'without args returns all vertices' do
+      expect(subject.reachable_destinations).to eq('all vertices')
+    end
+
+    it 'with args returns all vertices' do
+      expect(subject.reachable_destinations('something')).to eq('all vertices')
+    end
+
+  end
 end

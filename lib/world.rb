@@ -10,5 +10,10 @@ module TaxiLearner
     def tick
       @time += 1
     end
+
+    def reachable_destinations(*args)
+      # Assumes a connected graph
+      @graph.vertices
+    end
   end
 end
