@@ -4,14 +4,15 @@ module TaxiLearner
       DEFAULT_VALUE_ESTIMATE = 100
       attr_reader :value_estimates, :state, :visits
 
-      def initialize(state:, available_actions:,
-                     environment:, discount_factor: 0.1,
-                     step_size_function: nil, value_estimates: {},
+      def initialize(state:, 
+                     available_actions:,
+                     discount_factor: 0.1,
+                     step_size_function: nil, 
+                     value_estimates: {},
                      epsilon: 0)
         @discount_factor = discount_factor
         @state = state
-        @states = environment
-        @visits = @states.map{ |state| [state, Hash.new] }.to_h
+        @visits = { @state => Hash.new }
         @epsilon = epsilon
 
         @step_size_function = step_size_function || default_step_size_function

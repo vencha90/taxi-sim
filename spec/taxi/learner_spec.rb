@@ -1,15 +1,13 @@
 describe Taxi::Learner do
   let(:state) { 2 }
-  let(:environment) { [1, 2] }
   let(:available_actions) { ['action'] }
   let(:min_params) { {state: state,
-                      environment: environment,
                       available_actions: available_actions} }
   subject { Taxi::Learner.new(min_params)}
 
   describe 'initialisation' do
     it 'instantiates visited states' do
-      expect(subject.visits).to eq(1 => {}, 2 => {})
+      expect(subject.visits).to eq( 2 => {} )
     end
 
     it 'sets a default discount factor' do
@@ -34,7 +32,6 @@ describe Taxi::Learner do
 
   describe '#update!' do
     subject { Taxi::Learner.new(state: 0,
-      environment: [0, 1, 2],
       discount_factor: 0.2,
       step_size_function: double(call: 0.5),
       value_estimates: { 0 => {'action' => 0.5, 'other_action' => 1.0},
