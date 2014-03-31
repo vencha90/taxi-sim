@@ -3,7 +3,7 @@ module TaxiLearner
     attr_reader :fc, :vc, :prices
 
     def initialize(location:,
-                   destination: nil,
+                   passenger_destination: nil,
                    reachable_destinations:,
                    fc: 1,
                    vc: 1,
@@ -13,7 +13,7 @@ module TaxiLearner
       @vc = vc
       @busy_for = 0
       @location = location
-      @destination = destination
+      @passenger_destination = passenger_destination
       @reachable_destinations = reachable_destinations
       @prices = prices
       @learner = learner || Taxi::Learner.new(state: set_state,
@@ -29,6 +29,8 @@ module TaxiLearner
     end
 
     def tick!
+      @busy_for =- 1 if busy?
+      act!
     end
 
   private
@@ -38,7 +40,7 @@ module TaxiLearner
       @reachable_destinations.each do |destination|
         actions << Taxi::Action.new(:drive, destination)
       end
-      unless @destination.nil?
+      unless @passenger_destination.nil?
         @prices.each do |price|
           actions << Taxi::Action.new(:offer, price)
         end
@@ -47,10 +49,10 @@ module TaxiLearner
     end
 
     def set_state
-      if @destination.nil?
+      if @passenger_destination.nil?
         Taxi::State.new(@location)
       else
-        Taxi::State.new(@location, @destination)
+        Taxi::State.new(@location, @passenger_destination)
       end
     end
   end

@@ -1,5 +1,7 @@
 describe Taxi do
-  let(:min_params) { {reachable_destinations: [1, 2], location: 'location'} }
+  let(:min_params) { {reachable_destinations: [1, 2],
+                      location: 'location',
+                      learner: double(act!: nil)} }
   subject { Taxi.new(min_params) }
 
   describe 'initialisation' do
@@ -24,6 +26,7 @@ describe Taxi do
     context 'instantiates learner' do
       context 'assigned actions' do
         context 'without a set destination' do
+          subject { Taxi.new(min_params.merge(learner: nil)) }
           it 'include the minimal set of actions' do
             expect(Taxi::Learner).to receive(:new) do |args|
               expect(args[:available_actions]
@@ -37,8 +40,9 @@ describe Taxi do
 
         context 'with a set destination' do
           subject { Taxi.new(min_params.merge(prices: [10, 20],
-                                              destination: 'dest',
-                                              reachable_destinations: ['a'])) }
+                                              passenger_destination: 'dest',
+                                              reachable_destinations: ['a'],
+                                              learner: nil)) }
           it 'include prices' do
             expect(Taxi::Learner).to receive(:new) do |args|
               expect(args[:available_actions]
@@ -55,7 +59,8 @@ describe Taxi do
       context 'state' do
         context 'with a destination present' do
           subject { Taxi.new(min_params.merge(location: 'loc',
-                                              destination: 'dest')) }
+                                              passenger_destination: 'dest',
+                                              learner: nil)) }
           it 'is assigned location and destination' do
             expect(Taxi::Learner).to receive(:new) do |args|
               expect(args[:state]).to eq(Taxi::State.new('loc', 'dest'))
@@ -65,7 +70,7 @@ describe Taxi do
         end
 
         context 'with no destination present' do
-          subject { Taxi.new(min_params.merge(location: 'loc')) }
+          subject { Taxi.new(min_params.merge(location: 'loc', learner: nil)) }
 
           it 'is only assigned a location' do
             expect(Taxi::Learner).to receive(:new) do |args|
@@ -89,7 +94,14 @@ describe Taxi do
   end
 
   describe '#tick!' do
-    it { should respond_to :tick! }
-    it 'reduces busy time by 1 if busy'
+    it 'reduces busy time by 1 if busy' do
+      subject.instance_variable_set('@busy_for', 1)
+      expect{ subject.tick! }.to change{ subject.busy? }.from(be_true).to(be_false)
+    end
+
+    it 'calls #act!' do
+      expect(subject).to receive(:act!)
+      subject.tick!
+    end
   end
 end
