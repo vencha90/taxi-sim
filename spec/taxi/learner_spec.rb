@@ -85,6 +85,12 @@ describe Taxi::Learner do
         .with(action: 'selected', new_state: 'new state', reward: 123)
       act!
     end
+
+    it 'returns the action' do
+      allow(subject).to receive(:select_action).and_return('selected')
+      allow(subject).to receive(:update!)
+      expect(act!).to eq('selected')
+    end
   end
 
   describe '#select_action' do

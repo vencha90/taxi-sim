@@ -24,6 +24,7 @@ module TaxiLearner
         initialise_action_estimates(new_state, available_actions)
         action = select_action()
         update!(action: action, new_state: new_state, reward: reward)
+        action
       end
 
       def update!(action:, new_state:, reward:) # Q-learning basic

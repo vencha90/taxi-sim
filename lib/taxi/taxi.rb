@@ -1,6 +1,7 @@
 module TaxiLearner
   class Taxi
-    attr_reader :fc, :vc, :prices
+    attr_accessor :passenger_destination
+    attr_reader :fc, :vc, :prices, :reward, :action
 
     def initialize(location:,
                    passenger_destination: nil,
@@ -8,7 +9,8 @@ module TaxiLearner
                    fc: 1,
                    vc: 1,
                    learner: nil,
-                   prices: 1..20)
+                   prices: 1..20,
+                   reward: 0)
       @fc = fc
       @vc = vc
       @busy_for = 0
@@ -18,6 +20,8 @@ module TaxiLearner
       @prices = prices
       @learner = learner || Taxi::Learner.new(state: set_state,
                                     available_actions: available_actions)
+      @reward = reward
+      @action = nil
     end
 
     def busy?
@@ -25,11 +29,15 @@ module TaxiLearner
     end
 
     def act!
-      @learner.act!
+      last_profit = get_action_profit(@action)
+      @action = @learner.act!(available_actions: available_actions,
+                              new_state: @state,
+                              reward: @reward + last_profit)
     end
 
-    def tick!
+    def tick!(reward: 0, state: @state)
       @busy_for =- 1 if busy?
+      @reward = reward
       act!
     end
 
@@ -54,6 +62,10 @@ module TaxiLearner
       else
         Taxi::State.new(@location, @passenger_destination)
       end
+    end
+
+    def get_action_profit(action)
+      0
     end
   end
 end
