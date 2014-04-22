@@ -15,5 +15,9 @@ module TaxiLearner
       # Assumes a connected graph
       @graph.vertices
     end
+
+    def distance(a, b)
+      @graph.distance(a, b)
+    end
   end
 end

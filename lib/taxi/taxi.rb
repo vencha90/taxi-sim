@@ -3,24 +3,27 @@ module TaxiLearner
     attr_accessor :passenger_destination
     attr_reader :fc, :vc, :prices, :reward, :action
 
-    def initialize(location:,
-                   passenger_destination: nil,
+    def initialize(world:,
+                   location:,
                    reachable_destinations:,
+                   passenger_destination: nil,
                    fc: 1,
                    vc: 1,
-                   learner: nil,
                    prices: 1..20,
-                   reward: 0)
-      @fc = fc
-      @vc = vc
-      @busy_for = 0
+                   reward: 0,
+                   learner: nil)
+      @world = world
       @location = location
       @passenger_destination = passenger_destination
       @reachable_destinations = reachable_destinations
+      @fc = fc
+      @vc = vc
       @prices = prices
+      @reward = reward
+
       @learner = learner || Taxi::Learner.new(state: set_state,
                                     available_actions: available_actions)
-      @reward = reward
+      @busy_for = 0
       @action = nil
     end
 
@@ -44,13 +47,16 @@ module TaxiLearner
   private
 
     def available_actions
-      actions = [Taxi::Action.new(:wait)]
+      actions = [Taxi::Action.new(type: :wait)]
       @reachable_destinations.each do |destination|
-        actions << Taxi::Action.new(:drive, destination)
+        distance = @world.distance(@location, destination)
+        actions << Taxi::Action.new(type: :drive, 
+                                    value: destination,
+                                    units: distance)
       end
       unless @passenger_destination.nil?
         @prices.each do |price|
-          actions << Taxi::Action.new(:offer, price)
+          actions << Taxi::Action.new(type: :offer, value: price)
         end
       end
       actions

@@ -28,6 +28,15 @@ describe World do
     it 'with args returns all vertices' do
       expect(subject.reachable_destinations('something')).to eq('all vertices')
     end
+  end
 
+  describe '#distance' do
+    let(:graph) { double(distance: nil) }
+    subject { World.new(graph) }
+
+    it "calls graph's distance function" do
+      expect(graph).to receive(:distance).with('a', 'b')
+      subject.distance('a', 'b')
+    end
   end
 end
