@@ -13,20 +13,26 @@ describe Taxi::Action do
     it 'assigns units' do
       expect(subject.new(type: nil, units: 'dist').units).to eq('dist')
     end
+
+    it 'assigns unit cost' do
+      expect(subject.new(type: nil, unit_cost: 'cost').unit_cost).to eq('cost')
+    end
   end
 
   describe '#==' do
-    subject { Taxi::Action.new(type: 'type', value: 'value', units: 'units') }
-    let(:equal_action) { Taxi::Action.new(type: 'type', value: 'value', units: 'units') }
+    subject { Taxi::Action.new(type: 'type', value: 'value', units: 'units', unit_cost: 'cost') }
+    let(:equal_action) { Taxi::Action.new(type: 'type', value: 'value', units: 'units', unit_cost: 'cost') }
     let(:another_type) { Taxi::Action.new(type: 'another type') }
     let(:another_value) { Taxi::Action.new(type: 'type', value: 'value222') }
     let(:another_distance) { Taxi::Action.new(type: 'type', value: 'value', units: 'units222')}
+    let(:another_cost) { Taxi::Action.new(type: 'type', value: 'value', units: 'units', unit_cost: 'cost222')}
 
     it 'compares types and values and distances' do
       expect(subject).to eq(equal_action)
       expect(subject).not_to eq(another_type)
       expect(subject).not_to eq(another_value)
       expect(subject).not_to eq(another_distance)
+      expect(subject).not_to eq(another_cost)
     end
   end
 
@@ -40,25 +46,27 @@ describe Taxi::Action do
     its(:cost) { should eq(0) }
 
     context 'for waiting' do
-      subject { Taxi::Action.new(type: :wait) }
+      subject { Taxi::Action.new(type: :wait, unit_cost: 12) }
 
       it 'uses a single time unit in calculations' do
-        expect(subject.cost(12)).to eq(12)
+        expect(subject.cost).to eq(12)
       end
     end
 
     context 'for driving' do
-      subject { Taxi::Action.new(type: :drive, value: 'destination', units: 2) }
-
+      subject { Taxi::Action.new(type: :drive, 
+                                 value: 'destination',
+                                 units: 2,
+                                 unit_cost: 12) }
       it 'uses units in calculations' do
-        expect(subject.cost(22)).to eq(44)
+        expect(subject.cost).to eq(24)
       end
     end
 
     context 'for offering' do
-      subject { Taxi::Action.new(type: :offer) }
+      subject { Taxi::Action.new(type: :offer, unit_cost: 11) }
       it 'uses a single time unit in calculations' do
-        expect(subject.cost(11)).to eq(11)
+        expect(subject.cost).to eq(11)
       end
     end
   end

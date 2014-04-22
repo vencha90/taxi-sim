@@ -32,7 +32,7 @@ module TaxiLearner
     end
 
     def act!
-      last_profit = get_action_profit(@action)
+      last_profit = @action.nil? ? 0 : @action.cost
       @action = @learner.act!(available_actions: available_actions,
                               new_state: @state,
                               reward: @reward + last_profit)
@@ -44,23 +44,24 @@ module TaxiLearner
       act!
     end
 
-  private
-
     def available_actions
-      actions = [Taxi::Action.new(type: :wait)]
+      actions = [Taxi::Action.new(type: :wait, unit_cost: @fc)]
       @reachable_destinations.each do |destination|
         distance = @world.distance(@location, destination)
         actions << Taxi::Action.new(type: :drive, 
                                     value: destination,
-                                    units: distance)
+                                    units: distance,
+                                    unit_cost: @fc + @vc)
       end
       unless @passenger_destination.nil?
         @prices.each do |price|
-          actions << Taxi::Action.new(type: :offer, value: price)
+          actions << Taxi::Action.new(type: :offer, value: price, unit_cost: @fc)
         end
       end
       actions
     end
+
+  private
 
     def set_state
       if @passenger_destination.nil?
@@ -68,10 +69,6 @@ module TaxiLearner
       else
         Taxi::State.new(@location, @passenger_destination)
       end
-    end
-
-    def get_action_profit(action)
-      0
     end
   end
 end

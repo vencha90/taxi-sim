@@ -31,36 +31,15 @@ describe Taxi do
     end
 
     context 'instantiates learner' do
-      context 'assigned actions' do
-        context 'without a set destination' do
-          subject { Taxi.new(min_params.merge(learner: nil)) }
-          it 'include the minimal set of actions' do
-            expect(Taxi::Learner).to receive(:new) do |args|
-              expect(args[:available_actions]
-                ).to include(Taxi::Action.new(type: :wait),
-                             Taxi::Action.new(type: :drive, value: 1),
-                             Taxi::Action.new(type: :drive, value: 2))
-            end
-            subject
-          end
+      subject { Taxi.new(min_params.merge(learner: nil)) }
+      it 'includes available actions' do
+        allow_any_instance_of(Taxi
+          ).to receive(:available_actions
+          ).and_return([1, 2, 3])
+        expect(Taxi::Learner).to receive(:new) do |args|
+          expect(args[:available_actions]).to include(1, 2, 3)
         end
-
-        context 'with a set destination' do
-          subject { Taxi.new(min_params.merge(prices: [10, 20],
-                                              passenger_destination: 'dest',
-                                              reachable_destinations: ['a'],
-                                              learner: nil)) }
-          it 'include prices' do
-            expect(Taxi::Learner).to receive(:new) do |args|
-              expect(args[:available_actions]
-                ).to include(Taxi::Action.new(type: :wait),
-                             Taxi::Action.new(type: :drive, value: 'a'),
-                             Taxi::Action.new(type: :offer, value: 10),
-                             Taxi::Action.new(type: :offer, value: 20))
-            end
-            subject
-          end
-        end
+        subject
       end
 
       context 'state' do
@@ -92,14 +71,13 @@ describe Taxi do
 
   describe '#act!' do
     let(:learner) { double(act!: nil) }
-    let(:world) { double(distance: nil) }
     subject { Taxi.new(min_params.merge(learner: learner,
-                      reachable_destinations: [1],
-                      passenger_destination: 'dest',
-                      prices: [10],
+                      # reachable_destinations: [1],
+                      # passenger_destination: 'dest',
+                      # prices: [10],
                       location: 'loc',
-                      reward: 10,
-                      world: world)) }
+                      # reward: 10,
+                      world: double(distance: nil))) }
 
     it 'keeps track of the last action' do
       allow(learner).to receive(:act!).and_return('action')
@@ -110,15 +88,10 @@ describe Taxi do
 
     context 'calls the internal learner' do
       it 'with the available actions' do
-        allow(world).to receive(:distance).and_return('dist')
+        allow(subject).to receive(:available_actions).and_return([1, 2, 3])
         expect(learner).to receive(:act!) do |args|
-          expect(args[:available_actions]
-            ).to include(
-              Taxi::Action.new(type: :wait),
-              Taxi::Action.new(type: :drive, value: 1, units: 'dist'),
-              Taxi::Action.new(type: :offer, value: 10)
-            )
-          end
+          expect(args[:available_actions]).to include(1, 2, 3)
+        end
         subject.act!
       end
 
@@ -131,9 +104,9 @@ describe Taxi do
 
       it 'with the new reward' do
         subject.instance_variable_set('@reward', 20)
-        subject.stub(get_action_profit: 20)      
+        subject.instance_variable_set('@action', double(cost: 30))
         expect(learner).to receive(:act!) do |args|
-          expect(args[:reward]).to eq(40)
+          expect(args[:reward]).to eq(50)
         end
         subject.act!
       end
@@ -159,9 +132,43 @@ describe Taxi do
     end
   end
 
-  describe '#get_action_profit' do
-    it 'calculates profit for waiting'
-    it 'calculates profit for driving empty'
-    it 'calculates profit for serving a passenger'
+  describe '#available_actions' do
+    let(:world) { double(distance: 'dist') }
+
+    context 'without a set destination' do
+      subject { Taxi.new(min_params.merge(
+                  reachable_destinations: ['dest'],
+                  fc: 11,
+                  vc: 22,
+                  prices: [10],
+                  location: 'loc',
+                  world: world)) }
+
+      it 'returns the right set of actions - only driving and waiting' do
+        expect(subject.available_actions
+          ).to include(
+            Taxi::Action.new(type: :wait, unit_cost: 11),
+            Taxi::Action.new(type: :drive, value: 'dest', units: 'dist', unit_cost: 33),
+          )
+      end
+    end
+
+    context 'with a set destination' do
+      subject { Taxi.new(min_params.merge(
+                  reachable_destinations: ['dest'],
+                  passenger_destination: 'any',
+                  fc: 11,
+                  vc: 22,
+                  prices: [10, 20],
+                  location: 'loc',
+                  world: world )) }
+      it 'returns the right set of actions including offers' do
+          expect(subject.available_actions
+            ).to include(Taxi::Action.new(type: :wait, unit_cost: 11),
+                         Taxi::Action.new(type: :drive, value: 'dest', units: 'dist', unit_cost: 33),
+                         Taxi::Action.new(type: :offer, value: 10, unit_cost: 11),
+                         Taxi::Action.new(type: :offer, value: 20, unit_cost: 11))
+      end
+    end
   end
 end
