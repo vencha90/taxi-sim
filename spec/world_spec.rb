@@ -1,8 +1,9 @@
 describe World do
-  let(:graph) { double(random_vertex: 'random vx',
+  let(:vertex) { double(has_passenger?: nil)}
+  let(:graph) { double(random_vertex: vertex,
                        vertices: ['all vertices'],
                        distance: nil) }
-  subject { World.new(graph) }
+  subject { World.new(graph: graph) }
 
   describe 'initialisation' do
     it 'assigns graph' do
@@ -17,14 +18,37 @@ describe World do
       subject(:world) { World.allocate }
 
       it 'without a passenger present' do
-        expect(TaxiLearner::Taxi).to receive(:new).with(
-          world: world,
-          location: 'random vx',
-          reachable_destinations: ['all vertices'])
-        world.__send__(:initialize, graph)
+        expect(Taxi).to receive(:new)
+          .with(world: world,
+                location: vertex,
+                reachable_destinations: ['all vertices'])
+        world.__send__(:initialize, graph: graph)
       end
 
-      it 'assigns taxi a destination if a passenger is present'
+      context 'with a passenger present' do
+        before do
+          allow(vertex).to receive(:has_passenger?).and_return(true)
+          allow(Passenger).to receive(:new)
+            .and_return(double(destination: 'destination'))
+        end
+
+        it 'instantiates a passenger correctly' do
+          expect(Passenger).to receive(:new)
+            .with(world: world,
+                  location: vertex,
+                  price: 2)
+          world.__send__(:initialize, graph: graph, expected_price: 2)
+        end
+
+        it "assigns passenger's destination to a taxi" do
+          expect(Taxi).to receive(:new)
+            .with(world: world,
+                  location: vertex,
+                  reachable_destinations: ['all vertices'],
+                  passenger_destination: 'destination')
+          world.__send__(:initialize, graph: graph, expected_price: 2)
+        end
+      end
     end
   end
 

@@ -22,7 +22,7 @@ describe Passenger do
                             location: 'location_vertex',
                             price: 12) }
     it 'equals distance * price' do
-      allow(graph).to receive(:distance)
+      allow(world).to receive(:distance)
                         .with('location_vertex', 'destination_vertex')
                         .and_return(5)
       expect(subject.send(:expected_fare)).to eq(60)

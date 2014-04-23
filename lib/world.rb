@@ -2,9 +2,10 @@ module TaxiLearner
   class World
     attr_reader :graph, :time
 
-    def initialize(graph)
+    def initialize(graph:, expected_price: 1)
       @graph = graph
       @time = 0
+      @expected_price = expected_price
       @taxi = assign_taxi
     end
 
@@ -27,10 +28,12 @@ module TaxiLearner
       params = { world: self,
                  location: location,
                  reachable_destinations: @graph.vertices }
-      # if location.has_passenger?
-      #   passenger = Passenger.new
-      #   params[:passenger_destination] = passenger.destination
-      # end
+      if location.has_passenger?
+        passenger = Passenger.new(world: self,
+                                  location: location,
+                                  price: @expected_price)
+        params[:passenger_destination] = passenger.destination
+      end
       Taxi.new(params)
     end  
   end

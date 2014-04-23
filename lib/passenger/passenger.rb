@@ -16,7 +16,7 @@ module TaxiLearner
 
   private
     def expected_fare
-      distance = @world.graph.distance(@location, @destination)
+      distance = @world.distance(@location, @destination)
       distance * price
     end
 

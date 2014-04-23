@@ -13,7 +13,7 @@ module TaxiLearner
       raise(ArgumentError, 'please specify a file for input') if args.nil?
       parser = TaxiLearner::FileParser.new(args.first)
       graph = TaxiLearner::Graph.new(parser.graph_adjacency_matrix)
-      @world = TaxiLearner::World.new(graph)
+      @world = TaxiLearner::World.new(graph: graph)
     end
 
   private
