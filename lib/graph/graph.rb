@@ -35,6 +35,10 @@ module TaxiLearner
       @graph.vertices.sample
     end
 
+    def vertices
+      @graph.vertices
+    end
+
   private 
     def initialize_graph(matrix)
       matrix_length = matrix.length

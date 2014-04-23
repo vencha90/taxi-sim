@@ -1,12 +1,31 @@
 describe World do
-  subject { World.new('graph') }
+  let(:graph) { double(random_vertex: 'random vx',
+                       vertices: ['all vertices'],
+                       distance: nil) }
+  subject { World.new(graph) }
 
-  it 'assigns graph' do
-    expect(subject.graph).to eq('graph')
-  end
+  describe 'initialisation' do
+    it 'assigns graph' do
+      expect(subject.graph).to eq(graph)
+    end
 
-  it 'instantiates time' do
-    expect(subject.time).to eq(0)
+    it 'instantiates time' do
+      expect(subject.time).to eq(0)
+    end
+
+    context 'assigns a taxi' do
+      subject(:world) { World.allocate }
+
+      it 'without a passenger present' do
+        expect(TaxiLearner::Taxi).to receive(:new).with(
+          world: world,
+          location: 'random vx',
+          reachable_destinations: ['all vertices'])
+        world.__send__(:initialize, graph)
+      end
+
+      it 'assigns taxi a destination if a passenger is present'
+    end
   end
 
   describe '#tick' do
@@ -19,21 +38,17 @@ describe World do
   end
 
   describe '#reachable_destinations' do
-    subject { World.new(double(vertices: 'all vertices')) }
-
     it 'without args returns all vertices' do
-      expect(subject.reachable_destinations).to eq('all vertices')
+      expect(subject.reachable_destinations).to eq(['all vertices'])
     end
 
     it 'with args returns all vertices' do
-      expect(subject.reachable_destinations('something')).to eq('all vertices')
+      expect(subject.reachable_destinations('something')
+        ).to eq(['all vertices'])
     end
   end
 
   describe '#distance' do
-    let(:graph) { double(distance: nil) }
-    subject { World.new(graph) }
-
     it "calls graph's distance function" do
       expect(graph).to receive(:distance).with('a', 'b')
       subject.distance('a', 'b')

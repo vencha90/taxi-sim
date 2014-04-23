@@ -5,6 +5,9 @@ module TaxiLearner
     def initialize(graph)
       @graph = graph
       @time = 0
+      @taxi = TaxiLearner::Taxi.new(world: self,
+        location: @graph.random_vertex,
+        reachable_destinations: @graph.vertices)
     end
 
     def tick

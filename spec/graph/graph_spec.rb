@@ -54,8 +54,8 @@ describe Graph do
 
   describe '#find_vertex_by_label' do
     it 'returns the right vertex' do
-      v1 = subject.graph.vertices.sort.first
-      v3 = subject.graph.vertices.sort.last
+      v1 = subject.vertices.sort.first
+      v3 = subject.vertices.sort.last
       expect(subject.find_vertex_by_label(1)).to eq(v1)
       expect(subject.find_vertex_by_label(3)).to eq(v3)
     end
@@ -79,7 +79,13 @@ describe Graph do
 
   describe '#random_vertex' do
     it 'returns a randomly chosen vertex' do
-      expect(subject.graph.vertices).to include(subject.random_vertex)
+      expect(subject.vertices).to include(subject.random_vertex)
+    end
+  end
+
+  describe '#vertices' do
+    it "returns graph's vertices" do
+      expect(subject.vertices).to match_array([v1, v2, v3])
     end
   end
 end
