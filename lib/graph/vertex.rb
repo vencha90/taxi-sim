@@ -6,7 +6,7 @@ module TaxiLearner
 
       def initialize(label)
         @label = label.to_s
-        @passenger_probability = rand(0.1..0.9)
+        @passenger_probability = rand(0.0..1.0)
       end
 
       def ==(another_vertex)
@@ -22,6 +22,10 @@ module TaxiLearner
 
       def <=>(another_vertex)
         self.to_s <=> another_vertex.to_s
+      end
+
+      def has_passenger?
+        @passenger_probability > rand(0.0..1.0)
       end
     end
   end

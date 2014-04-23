@@ -7,7 +7,7 @@ describe Graph::Vertex do
     end
 
     it 'assigns a random probability of having a passenger' do
-      expect(0.1..0.9).to cover(subject.passenger_probability)
+      expect(0.0..1.0).to cover(subject.passenger_probability)
     end
   end
 
@@ -33,9 +33,21 @@ describe Graph::Vertex do
     end
   end
 
-  describe 'hash' do
+  describe '#hash' do
     it 'hashes the label' do
       expect(subject.hash).to eq(subject.label.hash)
+    end
+  end
+
+  describe '#has_passenger?' do
+    it 'is true if probability large' do
+      subject.instance_variable_set('@passenger_probability', 1.1)
+      expect(subject.has_passenger?).to be_true
+    end
+
+    it 'is false if probability small' do
+      subject.instance_variable_set('@passenger_probability', -0.1)
+      expect(subject.has_passenger?).to be_false
     end
   end
 end
