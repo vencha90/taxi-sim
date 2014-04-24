@@ -6,6 +6,12 @@ module TaxiLearner
       @yaml = Psych.parse_file(args).to_ruby
     end
 
+    def time_limit(yaml = @yaml)
+      input = yaml['time_limit']
+      raise ArgumentError, 'incorrect input time limit' if input =~ /\D/
+      input.nil? ? nil : input.to_i 
+    end
+
     def graph_adjacency_matrix(yaml = @yaml)
       matrix = yaml['graph']
       raise ArgumentError, "no input graph" if matrix.nil?

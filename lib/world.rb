@@ -2,7 +2,10 @@ module TaxiLearner
   class World
     attr_reader :graph, :time
 
-    def initialize(graph:, passenger_params:, taxi_params:)
+    def initialize(graph:,
+                   passenger_params:,
+                   taxi_params:,
+                   time_limit: 100000)
       @graph = graph
       @time = 0
       @passenger_params = passenger_params

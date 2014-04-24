@@ -17,6 +17,25 @@ describe FileParser do
   context 'with a correct input file' do
     subject { FileParser.new('spec/fixtures/input.yml') }
 
+    describe '#time_limit' do
+      it 'raises error on incorrect input' do
+        expect{ subject.time_limit('time_limit' => 'aaa')
+          }.to raise_error ArgumentError, 'incorrect input time limit'
+      end
+
+      it 'parses correctly' do
+        expect(subject.time_limit('time_limit' => '123')).to eq(123)
+      end
+
+      it 'is nil if input empty' do
+        expect(subject.time_limit('time_limit' => nil)).to be_nil
+      end
+
+      it 'uses input file by default' do
+        expect(subject.time_limit).to eq(100000)
+      end
+    end
+
     describe '#graph_adjacency_matrix' do
       context 'with incorrect input' do
         it 'raises error on missing top level key' do
