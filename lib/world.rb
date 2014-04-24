@@ -6,7 +6,7 @@ module TaxiLearner
       @graph = graph
       @time = 0
       @expected_price = expected_price
-      @taxi = assign_taxi
+      assign_taxi
     end
 
     def tick
@@ -15,12 +15,7 @@ module TaxiLearner
       if action
         if action.type == :offer && @passenger.accept_fare?(action.value)
           location = @passenger.destination
-          if location.has_passenger?
-            @passenger = Passenger.new(world: self,
-                            location: location,
-                            price: @expected_price)
-            @taxi.passenger_destination = @passenger.destination
-          end
+          set_new_passenger(location)
           reward = action.value - action.cost
           @taxi.tick!(reward: reward, location: location)
         else
@@ -47,13 +42,17 @@ module TaxiLearner
       params = { world: self,
                  location: location,
                  reachable_destinations: @graph.vertices }
+      @taxi = Taxi.new(params)
+      set_new_passenger(location)
+    end
+
+    def set_new_passenger(location)
       if location.has_passenger?
         @passenger = Passenger.new(world: self,
-                                  location: location,
-                                  price: @expected_price)
-        params[:passenger_destination] = @passenger.destination
+                        location: location,
+                        price: @expected_price)
+        @taxi.passenger_destination = @passenger.destination
       end
-      Taxi.new(params)
-    end  
+    end
   end
 end

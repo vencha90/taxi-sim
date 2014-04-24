@@ -40,13 +40,19 @@ describe World do
           world.__send__(:initialize, graph: graph, expected_price: 2)
         end
 
-        it "assigns passenger's destination to a taxi" do
+        it "instantiates a taxi correctly" do
           expect(Taxi).to receive(:new)
             .with(world: world,
                   location: vertex,
-                  reachable_destinations: ['all vertices'],
-                  passenger_destination: 'destination')
-          world.__send__(:initialize, graph: graph, expected_price: 2)
+                  reachable_destinations: ['all vertices'])
+            .and_call_original
+          world.__send__(:initialize, graph: graph)
+        end
+
+        it "assigns passenger's destination" do
+          world.__send__(:initialize, graph: graph)
+          expect(world.instance_variable_get('@taxi').passenger_destination)
+            .to eq('destination')
         end
       end
     end
