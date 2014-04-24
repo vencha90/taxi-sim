@@ -10,7 +10,7 @@ describe World do
                       passenger_params: passenger_params,
                       taxi_params: taxi_params) }
 
-  it 'assigns taxi params to new taxis: with fixed price and a range of prices'
+  it 'needs a way to manage all default values'
 
   describe 'initialisation' do
     it 'assigns graph' do
@@ -34,7 +34,8 @@ describe World do
         expect(Taxi).to receive(:new)
           .with(world: world,
                 location: vertex,
-                reachable_destinations: ['all vertices'])
+                reachable_destinations: ['all vertices'],
+                prices: 12..34)
         initialise_world
       end
 
@@ -57,7 +58,8 @@ describe World do
           expect(Taxi).to receive(:new)
             .with(world: world,
                   location: vertex,
-                  reachable_destinations: ['all vertices'])
+                  reachable_destinations: ['all vertices'],
+                  prices: 12..34)
             .and_call_original
           initialise_world
         end
@@ -68,6 +70,41 @@ describe World do
             .to eq('destination')
         end
       end
+    end
+  end
+
+  describe '#run_simulation' do
+    subject { World.new(graph: graph, 
+                        passenger_params: passenger_params,
+                        taxi_params: taxi_params,
+                        time_limit: 11) }
+
+    it 'runs #tick twice, each time until the time runs out' do
+      expect(subject).to receive(:tick).exactly(22).times
+      subject.run_simulation
+    end
+
+    it 'runs #tick again with a benchmark' do
+      allow(subject).to receive(:tick)
+      expect(Taxi).to receive(:new).with(world: subject,
+                location: vertex,
+                reachable_destinations: ['all vertices'],
+                prices: [66])
+      subject.run_simulation
+    end
+
+    it 'uses default benchmark prize unless specified' do
+      taxi_params.delete(:benchmark_price)
+      world = World.new(graph: graph, 
+                        passenger_params: passenger_params,
+                        taxi_params: taxi_params,
+                        time_limit: 11)
+      allow(world).to receive(:tick)
+      expect(Taxi).to receive(:new).with(world: world,
+                location: vertex,
+                reachable_destinations: ['all vertices'],
+                prices: [10])
+      world.run_simulation
     end
   end
 

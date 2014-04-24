@@ -2,14 +2,25 @@ module TaxiLearner
   class World
     attr_reader :graph, :time
 
+    DEFAULT_BENCHMARK_PRICE = 10
+
     def initialize(graph:,
                    passenger_params:,
                    taxi_params:,
                    time_limit: 100000)
       @graph = graph
       @time = 0
+      @time_limit = time_limit
+      @input_taxi_params = taxi_params
       @passenger_params = passenger_params
       assign_taxi
+    end
+
+    def run_simulation
+      @time_limit.times { tick }
+      benchmark = get_benchmark_price
+      @taxi = Taxi.new(get_taxi_params.merge(prices: benchmark))
+      @time_limit.times { tick }
     end
 
     def tick
@@ -40,13 +51,24 @@ module TaxiLearner
     end
 
   private
-    def assign_taxi
+    def get_benchmark_price
+      benchmark = @input_taxi_params[:benchmark_price]
+      benchmark = DEFAULT_BENCHMARK_PRICE if benchmark.nil?
+      [benchmark]
+    end
+
+    def get_taxi_params
       location = @graph.random_vertex
       params = { world: self,
                  location: location,
                  reachable_destinations: @graph.vertices }
-      @taxi = Taxi.new(params)
-      set_new_passenger(location)
+      prices = @input_taxi_params[:prices]
+      params.merge({prices: prices}) unless prices.nil?
+    end
+
+    def assign_taxi(prices = nil)
+      @taxi = Taxi.new(get_taxi_params)
+      set_new_passenger(get_taxi_params[:location])
     end
 
     def set_new_passenger(location)
