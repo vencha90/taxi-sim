@@ -5,6 +5,9 @@ describe World do
                        distance: nil) }
   subject { World.new(graph: graph) }
 
+  it 'assigns passenger params to new passengers'
+  it 'assigns taxi params to new taxis: with fixed price and a range of prices'
+
   describe 'initialisation' do
     it 'assigns graph' do
       expect(subject.graph).to eq(graph)

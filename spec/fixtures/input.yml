@@ -5,3 +5,6 @@ graph:
   - "2, 2, 0"
 passenger:
   price: 12
+taxi:
+  prices: '12..34'
+  benchmark_price: 123
