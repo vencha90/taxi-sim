@@ -2,10 +2,10 @@ module TaxiLearner
   class World
     attr_reader :graph, :time
 
-    def initialize(graph:, expected_price: 1)
+    def initialize(graph:, passenger_params:, taxi_params:)
       @graph = graph
       @time = 0
-      @expected_price = expected_price
+      @passenger_params = passenger_params
       assign_taxi
     end
 
@@ -48,9 +48,8 @@ module TaxiLearner
 
     def set_new_passenger(location)
       if location.has_passenger?
-        @passenger = Passenger.new(world: self,
-                        location: location,
-                        price: @expected_price)
+        @passenger = Passenger.new(
+          {world: self, location: location}.merge(@passenger_params) )
         @taxi.passenger_destination = @passenger.destination
       end
     end

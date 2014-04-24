@@ -3,9 +3,13 @@ describe World do
   let(:graph) { double(random_vertex: vertex,
                        vertices: ['all vertices'],
                        distance: nil) }
-  subject { World.new(graph: graph) }
+  let(:passenger_params) { {price: 99} }
+  let(:taxi_params) {{ prices: 12..34,
+                       benchmark_price: 66 }}
+  subject { World.new(graph: graph, 
+                      passenger_params: passenger_params,
+                      taxi_params: taxi_params) }
 
-  it 'assigns passenger params to new passengers'
   it 'assigns taxi params to new taxis: with fixed price and a range of prices'
 
   describe 'initialisation' do
@@ -19,13 +23,19 @@ describe World do
 
     context 'assigns a taxi' do
       subject(:world) { World.allocate }
+      let(:initialise_world) do
+         world.__send__(:initialize, 
+                        graph: graph,
+                        passenger_params: passenger_params,
+                        taxi_params: taxi_params)
+      end
 
       it 'without a passenger present' do
         expect(Taxi).to receive(:new)
           .with(world: world,
                 location: vertex,
                 reachable_destinations: ['all vertices'])
-        world.__send__(:initialize, graph: graph)
+        initialise_world
       end
 
       context 'with a passenger present' do
@@ -39,8 +49,8 @@ describe World do
           expect(Passenger).to receive(:new)
             .with(world: world,
                   location: vertex,
-                  price: 2)
-          world.__send__(:initialize, graph: graph, expected_price: 2)
+                  price: 99)
+          initialise_world
         end
 
         it "instantiates a taxi correctly" do
@@ -49,11 +59,11 @@ describe World do
                   location: vertex,
                   reachable_destinations: ['all vertices'])
             .and_call_original
-          world.__send__(:initialize, graph: graph)
+          initialise_world
         end
 
         it "assigns passenger's destination" do
-          world.__send__(:initialize, graph: graph)
+          initialise_world
           expect(world.instance_variable_get('@taxi').passenger_destination)
             .to eq('destination')
         end
@@ -111,7 +121,7 @@ describe World do
             expect(Passenger).to receive(:new)
               .with(world: subject,
                     location: vertex,
-                    price: 1)
+                    price: 99)
               .and_call_original
             subject.tick
           end
