@@ -1,7 +1,7 @@
 module TaxiLearner
   class Taxi
-    attr_accessor :passenger_destination
-    attr_reader :fc, :vc, :prices, :reward, :action
+    attr_accessor :passenger_destination, :busy_for
+    attr_reader :fc, :vc, :prices, :reward, :action, :location
 
     def initialize(world:,
                    location:,
@@ -38,9 +38,10 @@ module TaxiLearner
                               reward: @reward + last_profit)
     end
 
-    def tick!(reward: 0, state: @state)
+    def tick!(reward: 0, location: @location)
       @busy_for =- 1 if busy?
       @reward = reward
+      @location = location
       act!
     end
 

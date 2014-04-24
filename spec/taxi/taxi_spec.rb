@@ -13,8 +13,11 @@ describe Taxi do
     its(:prices) { should eq(1..20) }
     its(:reward) { should eq(0) }
     its(:action) { should eq(nil) }
+    its(:location) { should eq('location') }
     it { should respond_to :passenger_destination= }
     it { should respond_to :passenger_destination }
+    it { should respond_to :busy_for= }
+    it { should respond_to :busy_for }
 
     context 'additional param assignment' do
       subject { Taxi.new(min_params.merge(fc: 22, vc: 33,
@@ -115,7 +118,7 @@ describe Taxi do
 
   describe '#tick!' do
     it 'reduces busy time by 1 if busy' do
-      subject.instance_variable_set('@busy_for', 1)
+      subject.busy_for = 1
       expect{ subject.tick! 
         }.to change{ subject.busy? }.from(be_true).to(be_false)
     end
@@ -124,6 +127,11 @@ describe Taxi do
       expect{ subject.tick!(reward: 20)
         }.to change{ subject.instance_variable_get('@reward')
         }.from(0).to(20)
+    end
+
+    it 'sets the new location' do
+      expect{ subject.tick!(reward: 0, location: 'loc')
+        }.to change{ subject.location }.to('loc')
     end
 
     it 'calls #act!' do

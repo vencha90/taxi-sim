@@ -11,6 +11,25 @@ module TaxiLearner
 
     def tick
       @time += 1
+      action = @taxi.action
+      if action
+        if action.type == :offer && @passenger.accept_fare?(action.value)
+          location = @passenger.destination
+          if location.has_passenger?
+            @passenger = Passenger.new(world: self,
+                            location: location,
+                            price: @expected_price)
+            @taxi.passenger_destination = @passenger.destination
+          end
+          reward = action.value - action.cost
+          @taxi.tick!(reward: reward, location: location)
+        else
+          @taxi.tick!(reward: - action.cost)
+        end
+        @taxi.busy_for = action.cost
+      else
+        @taxi.tick!
+      end
     end
 
     def reachable_destinations(*args)
@@ -29,10 +48,10 @@ module TaxiLearner
                  location: location,
                  reachable_destinations: @graph.vertices }
       if location.has_passenger?
-        passenger = Passenger.new(world: self,
+        @passenger = Passenger.new(world: self,
                                   location: location,
                                   price: @expected_price)
-        params[:passenger_destination] = passenger.destination
+        params[:passenger_destination] = @passenger.destination
       end
       Taxi.new(params)
     end  
