@@ -2,7 +2,8 @@ module TaxiLearner
   class Passenger
     attr_reader :destination, :location, :price, :world, :characteristics
 
-    def initialize(world:, location: nil, price: 0, characteristics: [])
+    def initialize(world:, location: nil, price: 1,
+                   characteristics: default_characteristics)
       @world = world
       @location = location
       @destination = world.graph.random_vertex
@@ -32,6 +33,10 @@ module TaxiLearner
         sum += relative_weight * c.normalised_value
       end
       sum
+    end
+
+    def default_characteristics
+      [Passenger::Characteristic.new]
     end
   end
 end

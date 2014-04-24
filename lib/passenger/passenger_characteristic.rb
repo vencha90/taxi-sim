@@ -3,7 +3,7 @@ module TaxiLearner
     class Characteristic
       attr_reader :weight
 
-      def initialize(value: 0, weight: 0, function: nil)
+      def initialize(value: 1, weight: 1, function: default_function)
         @value = value
         @weight = weight
         @function = function
@@ -11,6 +11,12 @@ module TaxiLearner
 
       def normalised_value
         @function.call(@value)
+      end
+
+    private
+
+      def default_function
+        ->(value) { 0.5 * value }
       end
     end
   end

@@ -6,15 +6,18 @@ describe Passenger do
   describe 'initialisation' do
     subject { Passenger.new(world: world,
        location: 'location_vertex',
-       price: 'price',
-       characteristics: ['characteristic']) }
+       price: 'price') }
 
-    its(:characteristics) { should include('characteristic') }
     its(:characteristics) { should be_a_kind_of(Array) }
     its(:world) { should eq(world) }
     its(:location) { should eq('location_vertex') }
     its(:destination) { should eq('destination_vertex') }
     its(:price) { should eq('price') }
+
+    it 'instantiates a characteristic' do
+      expect(Passenger::Characteristic).to receive(:new).once
+      subject
+    end
   end
 
   describe '#expected_fare' do
@@ -27,10 +30,6 @@ describe Passenger do
                         .and_return(5)
       expect(subject.send(:expected_fare)).to eq(60)
     end
-  end
-
-  describe '#initialise_characteristics' do
-    it 'sets some characteristics'
   end
 
   describe '#probabilistic_value' do
