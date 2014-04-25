@@ -18,6 +18,7 @@ module TaxiLearner
                        taxi_params: parser.taxi }
       world_params[:time_limit] = parser.time_limit unless parser.time_limit.nil? 
       @world = TaxiLearner::World.new(world_params)
+      @world.run_simulation
     end
 
   private

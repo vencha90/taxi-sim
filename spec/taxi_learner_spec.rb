@@ -22,6 +22,7 @@ describe Runner do
           .with(graph: 'graph',
                 passenger_params: 'passenger',
                 taxi_params: 'taxi')
+          .and_return(double(run_simulation: nil))
         subject
       end
 
@@ -34,6 +35,7 @@ describe Runner do
                 passenger_params: 'passenger',
                 taxi_params: 'taxi',
                 time_limit: 100)
+          .and_return(double(run_simulation: nil))
         subject
       end
     end

@@ -6,5 +6,5 @@ if ARGV.first.downcase.strip == 'help'
 else
   # start up the main class
   require './lib/taxi_learner.rb'
-  TaxiLearner.new(ARGV)
+  TaxiLearner::Runner.new(ARGV)
 end
