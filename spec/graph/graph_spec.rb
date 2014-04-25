@@ -75,6 +75,18 @@ describe Graph do
       expect(subject.path_weight(1,3)).to eq(2)
       expect(subject.path_weight(3,1)).to eq(2)
     end
+
+    it 'saves a path to internal storage when calculated' do
+      expect{ subject.path_weight(1, 2) 
+        }.to change{ subject.known_paths
+        }.from({ }).to([1, 2] => 1)
+    end
+
+    it 'consults internal storage first when available' do
+      subject.path_weight(1, 2)
+      subject.instance_variable_set('@graph', double) # can no longer be called
+      subject.path_weight(1, 2)
+    end
   end
 
   describe '#random_vertex' do

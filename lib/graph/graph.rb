@@ -2,9 +2,10 @@ require 'plexus'
 
 module TaxiLearner
   class Graph
-    attr_reader :graph
+    attr_reader :graph, :known_paths
 
     def initialize(matrix)
+      @known_paths = {}
       initialize_graph(matrix)
     end
 
@@ -16,6 +17,8 @@ module TaxiLearner
     end
 
     def path_weight(start_label, finish_label)
+      val = @known_paths[[start_label, finish_label]]
+      return val unless val.nil?
       proc = Proc.new { |vertex| 0 }
       start_vertex = find_vertex_by_label(start_label)
       finish_vertex = find_vertex_by_label(finish_label)
@@ -26,6 +29,7 @@ module TaxiLearner
         next_vertex = path[index + 1]
         weight += @graph.edge_label(vertex, next_vertex)
       end
+      @known_paths[[start_label, finish_label]] = weight
       weight
     end
 
