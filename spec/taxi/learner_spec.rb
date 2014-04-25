@@ -57,6 +57,14 @@ describe Taxi::Learner do
     it 'sets old state to new state' do
       expect{ update! }.to change{ subject.state }.from(0).to(2)
     end
+
+    it 'updates visits of the next state later' do
+      expect(subject.visits[2]).to be_nil
+      2.times { subject.update!(action: 'action', new_state: 2, reward: 0.5) }
+      expect(subject.visits[2]['action']).to eq(1)
+      subject.update!(action: 'action', new_state: 2, reward: 0.5)
+      expect(subject.visits[2]['action']).to eq(2)      
+    end
   end
 
   describe '#act!' do

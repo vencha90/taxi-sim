@@ -28,7 +28,8 @@ module TaxiLearner
       end
 
       def update!(action:, new_state:, reward:) # Q-learning basic
-        if @visits[@state][action].nil? 
+        @visits[@state] = {} if @visits[@state].nil?
+        if @visits[@state][action].nil?
           @visits[@state][action] = 1
         else
           @visits[@state][action] += 1
