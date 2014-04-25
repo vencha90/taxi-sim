@@ -114,9 +114,36 @@ describe Taxi do
         subject.act!
       end
     end
+
+    context 'when passing actions to learner' do
+      subject { Taxi.new(min_params.merge(
+                  learner: learner,
+                  reachable_destinations: ['dest'],
+                  passenger_destination: 'any',
+                  prices: [10],
+                  location: 'loc',
+                  world: double(distance: nil) )) }
+
+      it 'does not use duplicate actions' do
+        actions = subject.available_actions
+
+        expect(learner).to receive(:act!) do |args|
+          expect(args[:available_actions].size).to eq(3)
+          args[:available_actions].each do |aa|
+            actions.each do |action|
+              expect(action).to be(aa) if action == aa
+            end
+          end
+        end
+        subject.act!
+      end
+    end
   end
 
   describe '#tick!' do
+    it 'does not create duplicate states' do
+    end
+
     it 'reduces busy time by 1 if busy' do
       subject.busy_for = 1
       expect{ subject.tick! 

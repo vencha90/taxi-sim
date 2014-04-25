@@ -12,6 +12,11 @@ module TaxiLearner
                    prices: 1..20,
                    reward: 0,
                    learner: nil)
+      @all_actions = []
+      @all_states = []
+      @busy_for = 0
+      @action = nil
+
       @world = world
       @location = location
       @passenger_destination = passenger_destination
@@ -23,8 +28,6 @@ module TaxiLearner
 
       @learner = learner || Taxi::Learner.new(state: set_state,
                                     available_actions: available_actions)
-      @busy_for = 0
-      @action = nil
     end
 
     def busy?
@@ -46,23 +49,36 @@ module TaxiLearner
     end
 
     def available_actions
-      actions = [Taxi::Action.new(type: :wait, unit_cost: @fc)]
+      actions = [find_or_create_action(type: :wait, unit_cost: @fc)]
       @reachable_destinations.each do |destination|
         distance = @world.distance(@location, destination)
-        actions << Taxi::Action.new(type: :drive, 
+        actions << find_or_create_action(type: :drive, 
                                     value: destination,
                                     units: distance,
                                     unit_cost: @fc + @vc)
       end
       unless @passenger_destination.nil?
         @prices.each do |price|
-          actions << Taxi::Action.new(type: :offer, value: price, unit_cost: @fc)
+          actions << find_or_create_action(type: :offer, value: price, unit_cost: @fc)
         end
       end
       actions
     end
 
   private
+    def find_or_create_action(**params)
+      temp = Taxi::Action.new(params)
+      found = nil
+      @all_actions.each do |action|
+        if temp == action
+          found = action 
+          break
+        end
+      end
+      action = found.nil? ? temp : found
+      @all_actions << action
+      action
+    end
 
     def set_state
       if @passenger_destination.nil?
