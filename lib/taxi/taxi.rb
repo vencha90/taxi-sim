@@ -1,5 +1,6 @@
 module TaxiLearner
   class Taxi
+    include Logging
     attr_accessor :passenger_destination, :busy_for
     attr_reader :fc, :vc, :prices, :reward, :action, :location
 
@@ -28,6 +29,8 @@ module TaxiLearner
 
       @learner = learner || Taxi::Learner.new(state: set_state,
                                     available_actions: available_actions)
+      write_log(fc: @fc, vc: @vc, prices: @prices,
+                 passenger_destination: @passenger_destination)
     end
 
     def busy?
@@ -42,6 +45,10 @@ module TaxiLearner
     end
 
     def tick!(reward: 0, location: @location)
+      write_log(reward: @reward,
+                busy: busy?,
+                location: @location,
+                passenger_destination: @passenger_destination)
       @busy_for =- 1 if busy?
       @reward = reward
       @location = location

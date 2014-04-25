@@ -1,5 +1,6 @@
 module TaxiLearner
   class World
+    include Logging
     attr_reader :graph, :time
 
     DEFAULT_BENCHMARK_PRICE = 10
@@ -14,6 +15,7 @@ module TaxiLearner
       @input_taxi_params = taxi_params
       @passenger_params = passenger_params
       assign_taxi
+      write_log(time: @time, time_limit: @time_limit)
     end
 
     def run_simulation
@@ -24,6 +26,7 @@ module TaxiLearner
     end
 
     def tick
+      write_log(time: @time)
       @time += 1
       action = @taxi.action
       if action
