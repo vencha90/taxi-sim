@@ -37,7 +37,7 @@ module TaxiLearner
     def act!
       last_profit = @action.nil? ? 0 : @action.cost
       @action = @learner.act!(available_actions: available_actions,
-                              new_state: @state,
+                              new_state: set_state,
                               reward: @reward + last_profit)
     end
 
@@ -67,24 +67,31 @@ module TaxiLearner
 
   private
     def find_or_create_action(**params)
-      temp = Taxi::Action.new(params)
-      found = nil
-      @all_actions.each do |action|
-        if temp == action
-          found = action 
-          break
-        end
-      end
-      action = found.nil? ? temp : found
-      @all_actions << action
-      action
+      find_or_create(Taxi::Action.new(params), @all_actions)
     end
 
     def set_state
       if @passenger_destination.nil?
-        Taxi::State.new(@location)
+        temp = Taxi::State.new(@location)
       else
-        Taxi::State.new(@location, @passenger_destination)
+        temp = Taxi::State.new(@location, @passenger_destination)
+      end
+      find_or_create(temp, @all_states)
+    end
+
+    def find_or_create(object, collection)
+      found = nil
+      collection.each do |item|
+        if object == item
+          found = item
+          break
+        end
+      end
+      if found.nil?
+        collection << object
+        object
+      else
+        found
       end
     end
   end

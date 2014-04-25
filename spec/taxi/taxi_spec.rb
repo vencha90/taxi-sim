@@ -98,13 +98,6 @@ describe Taxi do
         subject.act!
       end
 
-      it 'with the new state' do
-        expect(learner).to receive(:act!) do |args|
-          expect(args[:new_state]).to eq(subject.instance_variable_get '@state')
-        end
-        subject.act!
-      end
-
       it 'with the new reward' do
         subject.instance_variable_set('@reward', 20)
         subject.instance_variable_set('@action', double(cost: 30))
@@ -115,7 +108,7 @@ describe Taxi do
       end
     end
 
-    context 'when passing actions to learner' do
+    context 'when passing actions and state to learner' do
       subject { Taxi.new(min_params.merge(
                   learner: learner,
                   reachable_destinations: ['dest'],
@@ -137,13 +130,24 @@ describe Taxi do
         end
         subject.act!
       end
+
+      it 'does not create duplicate actions' do
+        subject.act!
+        all_actions = subject.instance_variable_get('@all_actions')
+        expect{ subject.act! }.to_not change{ all_actions }
+      end
+
+      it 'does not create duplicate states' do
+        all_states = subject.instance_variable_get('@all_states')
+        subject.act!
+        expect{ subject.act! 
+          }.to_not change{ all_states }
+        expect(all_states).to include(Taxi::State.new('loc', 'any'))
+      end
     end
   end
 
   describe '#tick!' do
-    it 'does not create duplicate states' do
-    end
-
     it 'reduces busy time by 1 if busy' do
       subject.busy_for = 1
       expect{ subject.tick! 
