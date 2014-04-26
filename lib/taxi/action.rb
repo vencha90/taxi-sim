@@ -22,14 +22,15 @@ module TaxiLearner
       def cost
         case @type
         when :wait
-          @unit_cost
+          cost = @unit_cost
         when :offer
-          @unit_cost
+          cost = @unit_cost
         when :drive
-          @units * @unit_cost
+          cost = @units * @unit_cost
         else
-          0
+          cost = 0
         end
+        cost < 1 ? 1 : cost
       end
     end
   end

@@ -40,7 +40,7 @@ module TaxiLearner
         params = process_action(location: @location,
                                 action: @action,
                                 passenger: passenger)
-        @reward = params[:reward] || 0
+        @reward = params[:reward] || -@fc
         @location = params[:location] || @location
         @busy_for = params[:busy_for]
         @passenger = passenger
@@ -69,9 +69,11 @@ module TaxiLearner
     end
 
     def process_action(location: , action:, passenger:)
-      return nil if action.nil?
-      learner_params = {}
-      if action.type == :offer && passenger.accept_fare?(action.value)
+      action_length = 1
+      learner_params = { busy_for: action_length }
+      return learner_params if action.nil?
+
+      if action.type == :offer && passenger && passenger.accept_fare?(action.value)
         reward = action.value - action.cost
         action_length = @world.distance(location, passenger.destination)
         learner_params = { reward: reward, location: passenger.destination }
@@ -80,9 +82,8 @@ module TaxiLearner
         learner_params = { reward: - @fc }
       elsif action.type == :drive
         action_length = @world.distance(location, action.value)
+        action_length = 1 if action_length < 1
         learner_params = { reward: - action.cost, location: action.value }
-      else 
-        return nil
       end
       learner_params[:busy_for] = action_length
       learner_params

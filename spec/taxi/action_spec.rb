@@ -43,7 +43,7 @@ describe Taxi::Action do
   end
 
   describe '#cost' do
-    its(:cost) { should eq(0) }
+    its(:cost) { should eq(1) }
 
     context 'for waiting' do
       subject { Taxi::Action.new(type: :wait, unit_cost: 12) }
@@ -68,6 +68,10 @@ describe Taxi::Action do
       it 'uses a single time unit in calculations' do
         expect(subject.cost).to eq(11)
       end
+    end
+
+    it 'cannot be lower than 1' do
+      expect(Taxi::Action.new(type: :offer, unit_cost: 0).cost).to eq(1)
     end
   end
 end

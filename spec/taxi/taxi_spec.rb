@@ -1,7 +1,6 @@
 describe Taxi do
   let(:world) { double(distance: nil) }
   let(:learner) { double(act!: nil) }
-  let(:fixed_cost) { 2 }
   let(:min_params) { {reachable_destinations: [1, 2],
                       location: 'location',
                       learner: learner,
@@ -72,7 +71,7 @@ describe Taxi do
     end
   end
 
-  describe 'act' do
+  describe '#act' do
     context 'when busy' do
       before { subject.instance_variable_set('@busy_for', 2) }
 
@@ -133,6 +132,11 @@ describe Taxi do
         expect{ subject.act('passenger') }.to change{ subject.passenger }.to('passenger')
       end
 
+      it 'uses fixed cost as reward if missing from params' do
+        allow(subject).to receive(:process_action).and_return({})
+        expect{ subject.act }.to change{ subject.reward }.to(-1)
+      end
+
       context 'calls learner' do
         after { subject.act }
         it 'with the right state' do
@@ -165,8 +169,8 @@ describe Taxi do
                       passenger: passenger)}
     subject { Taxi.new(min_params.merge(fc: 55))}
 
-    it 'returns nil if no action present' do
-      expect(process_action).to be_nil
+    it 'returns default busy_for if no action present' do
+      expect(process_action).to eq(busy_for: 1)
     end
 
     context 'offer' do
@@ -252,6 +256,11 @@ describe Taxi do
           .to match_array([:busy_for, :location, :reward])
         expect(process_action.size).to eq(3)
       end
+
+      it 'has no loophole for driving to current location' do
+        allow(world).to receive(:distance).and_return(0)
+        expect(process_action).to include(busy_for: 1)
+      end
     end
   end
 
@@ -290,7 +299,6 @@ describe Taxi do
   end
 
   describe '#available_actions' do
-    it 'remove global variables'
     let(:world) { double(distance: 'dist') }
 
     context 'without a set destination' do
