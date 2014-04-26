@@ -1,5 +1,6 @@
 module TaxiLearner
   class Passenger
+    include Logging
     attr_reader :destination, :location, :price, :world, :characteristics
 
     def initialize(world:, location: nil, price: 1,
@@ -12,7 +13,14 @@ module TaxiLearner
     end
 
     def accept_fare?(fare)
-      1 < ((expected_fare * probabilistic_value) / fare )
+      accept = 1 < ((expected_fare * probabilistic_value) / fare )
+      if accept
+        write_log(passenger: 'accepted',
+                  fare: fare,
+                  location: @location,
+                  destination: @destination)
+      end
+      accept
     end
 
   private

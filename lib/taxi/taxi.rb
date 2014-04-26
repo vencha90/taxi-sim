@@ -15,10 +15,10 @@ module TaxiLearner
       @all_states = []
       @busy_for = 0
       @action = nil
+      @passenger = nil
 
       @world = world
       @location = location
-      @passenger = nil
       @reachable_destinations = reachable_destinations
       @fc = fc
       @vc = vc
@@ -100,19 +100,13 @@ module TaxiLearner
   private
 
     def log_params
-      passenger_destination = @passenger.nil? ? nil : @passenger.destination
-      if busy?
-        { reward: @reward,
-          busy: busy?,
-          destination: @location,
-          busy_for: @busy_for,
-          action: @action.type }
-      else
-        { reward: @reward,
-          busy: busy?,
-          location: @location,
-          passenger_destination: passenger_destination }
-      end
+      action_type = @action.nil? ? nil : @action.type
+      { reward: @reward,
+        busy: busy?,
+        location: @location,
+        busy_for: @busy_for,
+        action: action_type
+      }
     end
 
     def find_or_create_action(**params)
