@@ -25,7 +25,7 @@ module TaxiLearner
       @prices = prices
       @reward = reward
 
-      @learner = learner || Taxi::Learner.new(state: set_state,
+      @learner = learner || Taxi::Learner.new(state: set_state(@location),
                                     available_actions: available_actions)
       write_log(fc: @fc, vc: @vc, prices: @prices)
     end
@@ -46,7 +46,7 @@ module TaxiLearner
         @passenger = passenger
         write_log(log_params)
         @action = @learner.act!(available_actions: available_actions,
-                                new_state: set_state,
+                                new_state: set_state(@location, @passenger),
                                 reward: @reward)
       end
     end
@@ -88,11 +88,11 @@ module TaxiLearner
       learner_params
     end
 
-    def set_state
-      if @passenger.nil? || @passenger.destination.nil?
-        temp = Taxi::State.new(@location)
+    def set_state(location, passenger = nil)
+      if passenger.nil? || passenger.destination.nil?
+        temp = Taxi::State.new(location)
       else
-        temp = Taxi::State.new(@location, @passenger.destination)
+        temp = Taxi::State.new(location, passenger.destination)
       end
       find_or_create(temp, @all_states)
     end
@@ -100,6 +100,7 @@ module TaxiLearner
   private
 
     def log_params
+      passenger_destination = @passenger.nil? ? nil : @passenger.destination
       if busy?
         { reward: @reward,
           busy: busy?,
@@ -110,7 +111,7 @@ module TaxiLearner
         { reward: @reward,
           busy: busy?,
           location: @location,
-          passenger_destination: @passenger_destination }
+          passenger_destination: passenger_destination }
       end
     end
 

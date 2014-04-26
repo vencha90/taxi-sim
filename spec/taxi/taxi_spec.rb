@@ -256,7 +256,37 @@ describe Taxi do
   end
 
   describe '#set_state' do
-    it 'pending a refactor'
+    context 'when no passenger with a destination' do
+      let(:passenger) { double(destination: nil) }
+
+      it 'returns a state with a location only' do
+        expect(subject.set_state('location')).to eq(Taxi::State.new('location'))
+      end
+
+      it 'returns a state with a destination-less passenger' do
+        expect(subject.set_state('location', passenger))
+          .to eq(Taxi::State.new('location'))
+      end
+
+      it 'does not create duplicates' do
+        old_state = subject.set_state('l')
+        expect(subject.set_state('l')).to be(old_state)
+      end
+    end
+
+    context 'with a passenger with a destination' do
+      let(:passenger) { double(destination: 'destination') }
+
+      it 'returns a state with a location and a destination' do
+        expect(subject.set_state('location', passenger))
+          .to eq(Taxi::State.new('location', 'destination'))
+      end
+
+      it 'does not create duplicates' do
+        old_state = subject.set_state('l', passenger)
+        expect(subject.set_state('l', passenger)).to be(old_state)
+      end
+    end
   end
 
   describe '#available_actions' do
