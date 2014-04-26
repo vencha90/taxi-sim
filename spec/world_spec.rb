@@ -46,14 +46,6 @@ describe World do
             .and_return(double(destination: 'destination'))
         end
 
-        it 'instantiates a passenger correctly' do
-          expect(Passenger).to receive(:new)
-            .with(world: world,
-                  location: vertex,
-                  price: 99)
-          initialise_world
-        end
-
         it "instantiates a taxi correctly" do
           expect(Taxi).to receive(:new)
             .with(world: world,
@@ -64,10 +56,9 @@ describe World do
           initialise_world
         end
 
-        it "assigns passenger's destination" do
+        it 'writes log' do
+          expect(subject).to receive(:write_log).with(time: 0, time_limit: 100000)
           initialise_world
-          expect(world.instance_variable_get('@taxi').passenger_destination)
-            .to eq('destination')
         end
       end
     end
@@ -109,88 +100,53 @@ describe World do
   end
 
   describe '#tick' do
-    let(:taxi) { subject.instance_variable_get('@taxi') }
-    let(:action) { double(type: nil, cost: 5) }
-    let(:passenger) { double(destination: vertex) }
-    before { subject.instance_variable_set('@passenger', passenger) }
-
-    it 'needs a refactor'
+    let(:taxi) { double(act: nil, :passenger_destination= => nil, location: vertex) }
+    let(:passenger) { double(new: nil, destination: nil) }
+    
+    before do
+      subject.instance_variable_set('@taxi', taxi)
+      allow(Passenger).to receive(:new).and_return(passenger)
+    end
 
     it 'advances internal time' do
       expect{ subject.tick }.to change{ subject.time }.by(1)
     end
 
-    context 'with a selected action' do
-      before do
-        allow(taxi).to receive(:action).and_return(action)
-        allow(action).to receive(:value).and_return(0)
-      end
-
-      it 'assigns taxi as busy' do
-        expect{ subject.tick
-          }.to change{ taxi.busy? }.from(be_false).to(be_true)
-      end
-
-      it "sets taxi busy for as long as the action costs" do
-        expect{ subject.tick
-          }.to change{ taxi.busy_for }.from(0).to(5)
-      end
-
-      context 'when offer is accepted by passenger' do
-        before do
-          allow(passenger).to receive(:accept_fare?).and_return(true)
-          allow(passenger).to receive(:destination).and_return(vertex)
-          allow(action).to receive(:type).and_return(:offer)
-        end
-
-        it 'does not assign a new passenger' do
-          expect{ subject.tick }.to_not change{ passenger }
-        end
-
-        it "does not change taxi's destination" do
-          expect{ subject.tick }.to_not change{ taxi.passenger_destination }
-        end
-
-        context 'if the new location has a passenger' do
-          before { allow(vertex).to receive(:has_passenger?).and_return(true) }
-
-          it 'assigns a new passenger' do
-            expect(Passenger).to receive(:new)
-              .with(world: subject,
-                    location: vertex,
-                    price: 99)
-              .and_call_original
-            subject.tick
-          end
-
-          it "changes taxi's destination to the new passenger's" do
-            allow(Passenger).to receive(:new)
-              .and_return(double(destination: 'dest'))
-            expect{ subject.tick
-              }.to change{ taxi.passenger_destination }.to('dest')
-          end
-        end
-      end
-
-      context 'rewards only cost' do
-        it 'when action is not an offer' do
-          expect(taxi).to receive(:tick!).with(reward: -5)
-          subject.tick
-        end
-
-        it 'when action is an offer but passenger declines fare' do
-          allow(action).to receive(:type).and_return(:offer)
-          allow(passenger).to receive(:accept_fare?).and_return(false)
-          expect(taxi).to receive(:tick!).with(reward: -5)
-          subject.tick
-        end
-      end
+    it 'writes log' do
+      expect(subject).to receive(:write_log).with(time: 1)
+      subject.tick
     end
 
-    context 'when no action selected' do
-      it 'calls taxi#tick!' do
-        expect(taxi).to receive(:tick!).with(no_args)
-        subject.tick
+    it 'calls taxi to process action' do
+      allow(vertex).to receive(:has_passenger?).and_return(true)
+      expect(taxi).to receive(:act).with(passenger)
+      subject.tick
+    end
+
+    context 'sets a new passenger' do
+      it 'nil if no passenger present' do
+        allow(vertex).to receive(:has_passenger?).and_return(false)
+        expect(subject.passenger).to be_nil
+        expect{ subject.tick 
+          }.to_not change{ subject.passenger }
+      end
+
+      context 'if location has a passenger' do
+        before { allow(vertex).to receive(:has_passenger?).and_return(true) }
+        it 'instantiates passenger with the right params' do
+          expect(Passenger).to receive(:new)
+            .with({ world: subject, location: vertex}.merge(passenger_params))
+          subject.tick
+        end
+
+        it 'sets the passenger variable' do
+          new_pass = double(destination: nil)
+          allow(Passenger).to receive(:new).and_return(new_pass)
+
+          expect{ subject.tick 
+            }.to change{ subject.passenger 
+            }.from(be_nil).to(new_pass)
+        end
       end
     end
   end
