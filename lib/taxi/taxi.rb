@@ -45,10 +45,7 @@ module TaxiLearner
     end
 
     def tick!(reward: 0, location: @location)
-      write_log(reward: @reward,
-                busy: busy?,
-                location: @location,
-                passenger_destination: @passenger_destination)
+      write_log(log_params)
       @busy_for =- 1 if busy?
       @reward = reward
       @location = location
@@ -73,6 +70,21 @@ module TaxiLearner
     end
 
   private
+    def log_params
+      if busy?
+        { reward: @reward,
+          busy: busy?,
+          destination: @location,
+          busy_for: @busy_for,
+          action: @action.type }
+      else
+        { reward: @reward,
+          busy: busy?,
+          location: @location,
+          passenger_destination: @passenger_destination }
+      end
+    end
+
     def find_or_create_action(**params)
       find_or_create(Taxi::Action.new(params), @all_actions)
     end

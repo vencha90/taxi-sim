@@ -35,8 +35,11 @@ module TaxiLearner
 
     alias :distance :path_weight
 
-    def random_vertex
-      @graph.vertices.sample
+    def random_vertex(vertex = nil)
+      begin
+        random = @graph.vertices.sample
+      end until random != vertex || @graph.vertices.size <= 1
+      random
     end
 
     def vertices

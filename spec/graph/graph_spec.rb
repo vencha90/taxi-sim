@@ -93,6 +93,10 @@ describe Graph do
     it 'returns a randomly chosen vertex' do
       expect(subject.vertices).to include(subject.random_vertex)
     end
+
+    it 'returns a vertex other than the one supplied' do
+      expect(subject.random_vertex(v1)).to_not eq(v1)
+    end
   end
 
   describe '#vertices' do
