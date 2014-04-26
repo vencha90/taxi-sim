@@ -1,13 +1,11 @@
 module TaxiLearner
   class Taxi
     include Logging
-    attr_accessor :passenger_destination, :busy_for
-    attr_reader :fc, :vc, :prices, :reward, :action, :location
+    attr_reader :fc, :vc, :prices, :reward, :action, :location, :passenger, :busy_for
 
     def initialize(world:,
                    location:,
                    reachable_destinations:,
-                   passenger_destination: nil,
                    fc: 1,
                    vc: 1,
                    prices: 1..20,
@@ -20,7 +18,7 @@ module TaxiLearner
 
       @world = world
       @location = location
-      @passenger_destination = passenger_destination
+      @passenger = nil
       @reachable_destinations = reachable_destinations
       @fc = fc
       @vc = vc
@@ -29,27 +27,28 @@ module TaxiLearner
 
       @learner = learner || Taxi::Learner.new(state: set_state,
                                     available_actions: available_actions)
-      write_log(fc: @fc, vc: @vc, prices: @prices,
-                 passenger_destination: @passenger_destination)
+      write_log(fc: @fc, vc: @vc, prices: @prices)
     end
 
     def busy?
       @busy_for > 0
     end
 
-    def act!
-      last_profit = @action.nil? ? 0 : @action.cost
-      @action = @learner.act!(available_actions: available_actions,
-                              new_state: set_state,
-                              reward: @reward + last_profit)
-    end
-
-    def tick!(reward: 0, location: @location)
-      write_log(log_params)
-      @busy_for =- 1 if busy?
-      @reward = reward
-      @location = location
-      act!
+    def act(passenger = nil)
+      @busy_for -= 1 if self.busy?
+      unless self.busy?
+        params = process_action(location: @location,
+                                action: @action,
+                                passenger: passenger)
+        @reward = params[:reward] || 0
+        @location = params[:location] || @location
+        @busy_for = params[:busy_for]
+        @passenger = passenger
+        write_log(log_params)
+        @action = @learner.act!(available_actions: available_actions,
+                                new_state: set_state,
+                                reward: @reward)
+      end
     end
 
     def available_actions
@@ -61,7 +60,7 @@ module TaxiLearner
                                     units: distance,
                                     unit_cost: @fc + @vc)
       end
-      unless @passenger_destination.nil?
+      unless @passenger.nil? || @passenger.destination.nil?
         @prices.each do |price|
           actions << find_or_create_action(type: :offer, value: price, unit_cost: @fc)
         end
@@ -69,7 +68,37 @@ module TaxiLearner
       actions
     end
 
+    def process_action(location: , action:, passenger:)
+      return nil if action.nil?
+      learner_params = {}
+      if action.type == :offer && passenger.accept_fare?(action.value)
+        reward = action.value - action.cost
+        action_length = @world.distance(location, passenger.destination)
+        learner_params = { reward: reward, location: passenger.destination }
+      elsif action.type == :offer || action.type == :wait
+        action_length = 1
+        learner_params = { reward: - @fc }
+      elsif action.type == :drive
+        action_length = @world.distance(location, action.value)
+        learner_params = { reward: - action.cost, location: action.value }
+      else 
+        return nil
+      end
+      learner_params[:busy_for] = action_length
+      learner_params
+    end
+
+    def set_state
+      if @passenger.nil? || @passenger.destination.nil?
+        temp = Taxi::State.new(@location)
+      else
+        temp = Taxi::State.new(@location, @passenger.destination)
+      end
+      find_or_create(temp, @all_states)
+    end
+
   private
+
     def log_params
       if busy?
         { reward: @reward,
@@ -87,15 +116,6 @@ module TaxiLearner
 
     def find_or_create_action(**params)
       find_or_create(Taxi::Action.new(params), @all_actions)
-    end
-
-    def set_state
-      if @passenger_destination.nil?
-        temp = Taxi::State.new(@location)
-      else
-        temp = Taxi::State.new(@location, @passenger_destination)
-      end
-      find_or_create(temp, @all_states)
     end
 
     def find_or_create(object, collection)
