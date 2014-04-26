@@ -16,7 +16,7 @@ module TaxiLearner
     private
 
       def default_function
-        ->(value) { 0.25 * value }
+        ->(value) { 0.7 * value }
       end
     end
   end

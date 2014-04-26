@@ -13,13 +13,12 @@ module TaxiLearner
     end
 
     def accept_fare?(fare)
-      accept = 1 < ((expected_fare * probabilistic_value) / fare )
-      if accept
-        write_log(passenger: 'accepted',
-                  fare: fare,
-                  location: @location,
-                  destination: @destination)
-      end
+      accept = 0.5 > ((expected_fare * probabilistic_value) / fare )
+      str = accept ? 'accepted' : 'declined'
+      write_log(passenger: str,
+          fare: fare,
+          location: @location,
+          destination: @destination)
       accept
     end
 
