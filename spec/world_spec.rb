@@ -21,22 +21,33 @@ describe World do
       expect(subject.time).to eq(0)
     end
 
-    context 'assigns a taxi' do
-      subject(:world) { World.allocate }
-      let(:initialise_world) do
-         world.__send__(:initialize, 
-                        graph: graph,
-                        passenger_params: passenger_params,
-                        taxi_params: taxi_params)
-      end
+    it 'writes log' do
+      world = World.allocate
+      expect(world).to receive(:write_summary)
+      world.__send__(:initialize,
+                     graph: graph,
+                     passenger_params: passenger_params,
+                     taxi_params: taxi_params)
+    end
+  end
 
+  describe '#run_simulation' do
+    let(:taxi) { double(total_profit: 0, location: vertex, act: nil) }
+    subject { World.new(graph: graph, 
+                        passenger_params: passenger_params,
+                        taxi_params: taxi_params,
+                        time_limit: 11) }
+
+    before { allow(Taxi).to receive(:new).and_return(taxi) }
+
+    context 'assigns a taxi' do
       it 'without a passenger present' do
         expect(Taxi).to receive(:new)
-          .with(world: world,
+          .with(world: subject,
                 location: vertex,
                 reachable_destinations: ['all vertices'],
                 prices: 12..34)
-        initialise_world
+        subject.run_simulation
       end
 
       context 'with a passenger present' do
@@ -48,27 +59,15 @@ describe World do
 
         it "instantiates a taxi correctly" do
           expect(Taxi).to receive(:new)
-            .with(world: world,
+            .with(world: subject,
                   location: vertex,
                   reachable_destinations: ['all vertices'],
                   prices: 12..34)
-            .and_call_original
-          initialise_world
-        end
-
-        it 'writes log' do
-          expect(subject).to receive(:write_log).with(time: 0, time_limit: 100000)
-          initialise_world
+            .and_return(taxi)
+          subject.run_simulation
         end
       end
     end
-  end
-
-  describe '#run_simulation' do
-    subject { World.new(graph: graph, 
-                        passenger_params: passenger_params,
-                        taxi_params: taxi_params,
-                        time_limit: 11) }
 
     it 'runs #tick twice, each time until the time runs out' do
       expect(subject).to receive(:tick).exactly(22).times
@@ -88,14 +87,24 @@ describe World do
       taxi_params.delete(:benchmark_price)
       world = World.new(graph: graph, 
                         passenger_params: passenger_params,
-                        taxi_params: taxi_params,
-                        time_limit: 11)
+                        taxi_params: taxi_params)
       allow(world).to receive(:tick)
-      expect(Taxi).to receive(:new).with(world: world,
-                location: vertex,
-                reachable_destinations: ['all vertices'],
-                prices: [10])
+      expect(Taxi).as_null_object.to receive(:new)
+        .with(world: world,
+              location: vertex,
+              reachable_destinations: ['all vertices'],
+              prices: [10])
       world.run_simulation
+    end
+
+    it 'does not exceed time limit' do
+      expect{ subject.run_simulation }.to change{ subject.time 
+        }.from(0).to(11)
+    end
+
+    it 'writes summary' do
+      expect(subject).to receive(:write_summary).twice
+      subject.run_simulation
     end
   end
 

@@ -15,15 +15,18 @@ module TaxiLearner
       @time_limit = time_limit
       @taxi_params = taxi_params
       @passenger_params = passenger_params
-      @taxi = Taxi.new(get_taxi_params)
-      write_log(time: @time, time_limit: @time_limit)
+      write_summary(time: @time, time_limit: @time_limit)
     end
 
     def run_simulation
+      @taxi = Taxi.new(get_taxi_params)
       @time_limit.times { tick }
+      write_summary(time: @time, profit: @taxi.total_profit)
+      @time = 0
       benchmark = get_benchmark_price
       @taxi = Taxi.new(get_taxi_params.merge(prices: benchmark))
       @time_limit.times { tick }
+      write_summary(time: @time, profit: @taxi.total_profit)
     end
 
     def tick

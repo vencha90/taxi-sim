@@ -1,7 +1,15 @@
 module TaxiLearner
   class Taxi
     include Logging
-    attr_reader :fc, :vc, :prices, :reward, :action, :location, :passenger, :busy_for
+    attr_reader :action,
+                :busy_for,
+                :fc,
+                :location,
+                :passenger,
+                :prices,
+                :reward,
+                :total_profit,
+                :vc
 
     FIXED_COST = 1
     VARIABLE_COST = 1
@@ -21,6 +29,7 @@ module TaxiLearner
       @busy_for = 0
       @action = nil
       @passenger = nil
+      @total_profit = 0
 
       @world = world
       @location = location
@@ -32,7 +41,7 @@ module TaxiLearner
 
       @learner = learner || Taxi::Learner.new(state: set_state(@location),
                                     available_actions: available_actions)
-      write_log(fc: @fc, vc: @vc, prices: @prices)
+      write_summary(fc: @fc, vc: @vc, prices: @prices)
     end
 
     def busy?
@@ -46,6 +55,7 @@ module TaxiLearner
                                 action: @action,
                                 passenger: passenger)
         @reward = params[:reward] || -@fc
+        @total_profit += @reward
         @location = params[:location] || @location
         @busy_for = params[:busy_for]
         @passenger = passenger

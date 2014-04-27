@@ -16,6 +16,7 @@ describe Taxi do
     its(:reward) { should eq(0) }
     its(:action) { should eq(nil) }
     its(:location) { should eq('location') }
+    its(:total_profit) { should eq(0) }
     it { should respond_to :passenger }
     it { should respond_to :busy_for }
 
@@ -117,6 +118,13 @@ describe Taxi do
 
       it 'changes reward' do
         expect{ subject.act }.to change{ subject.reward }.to(123)
+      end
+
+      it 'changes total profit' do
+        subject.instance_variable_set('@total_profit', 111)
+        expect{ subject.act 
+          }.to change{ subject.total_profit 
+          }.from(111).to(234)
       end
 
       it 'changes action' do
