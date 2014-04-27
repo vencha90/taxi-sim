@@ -7,7 +7,7 @@ module TaxiLearner
                    characteristics: default_characteristics)
       @world = world
       @location = location
-      @destination = world.graph.random_vertex
+      @destination = world.graph.random_vertex(location)
       @price = price
       @characteristics = characteristics
     end
@@ -22,10 +22,9 @@ module TaxiLearner
       accept
     end
 
-  private
     def expected_fare
       distance = @world.distance(@location, @destination)
-      distance * price
+      distance * @price
     end
 
     def probabilistic_value
@@ -41,6 +40,8 @@ module TaxiLearner
       end
       sum
     end
+
+  private
 
     def default_characteristics
       [Passenger::Characteristic.new]
