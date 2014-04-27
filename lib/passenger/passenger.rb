@@ -4,7 +4,8 @@ module TaxiLearner
     attr_reader :destination, :location, :price, :world, :characteristics
 
     PRICE = 1
-    THRESHOLD = 1
+    THRESHOLD = 0.75
+    RANDOMNESS = 0.75..1.0
 
     def initialize(world:, location: nil, price: PRICE,
                    characteristics: default_characteristics)
@@ -16,7 +17,7 @@ module TaxiLearner
     end
 
     def accept_fare?(fare)
-      accept = THRESHOLD < ((expected_fare * probabilistic_value) / fare )
+      accept = rand(RANDOMNESS) * THRESHOLD < ((expected_fare * probabilistic_value) / fare )
       str = accept ? 'accepted' : 'declined'
       write_log(passenger: str,
           fare: fare,

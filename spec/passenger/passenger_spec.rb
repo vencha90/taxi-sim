@@ -50,11 +50,11 @@ describe Passenger do
     end
 
     it 'is true if offered fare too low' do
-      expect(subject.accept_fare?(2.4)).to be_true
+      expect(subject.accept_fare?(2.5)).to be_true
     end
 
     it 'is false if offered fare too high' do
-      expect(subject.accept_fare?(2.6)).to be_false
+      expect(subject.accept_fare?(5.625)).to be_false
     end
   end
 end

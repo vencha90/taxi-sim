@@ -20,11 +20,11 @@ describe Passenger::Characteristic do
     end
 
     it 'has a default function' do
-      expect(subject.new(value: 2).normalised_value).to eq(0.5)
+      expect(subject.new(value: 2).normalised_value).to eq(2)
     end
 
     it 'has a default function and value' do
-      expect(subject.new.normalised_value).to eq(0.25)
+      expect(subject.new.normalised_value).to eq(1)
     end
   end
 end

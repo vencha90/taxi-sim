@@ -5,7 +5,7 @@ module TaxiLearner
 
       VALUE = 1
       WEIGHT = 1
-      DEFAULT_MODIFIER = 0.25
+      DEFAULT_MODIFIER = 1
 
       def initialize(value: VALUE,
                      weight: WEIGHT,
