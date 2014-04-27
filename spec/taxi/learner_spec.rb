@@ -11,11 +11,11 @@ describe Taxi::Learner do
     end
 
     it 'sets a default discount factor' do
-      expect(subject.instance_variable_get '@discount_factor').to eq(0.1)
+      expect(subject.instance_variable_get '@discount_factor').to eq(0.9)
     end
 
     it 'sets epsilon to use random actions' do
-      expect(subject.instance_variable_get '@epsilon').to eq(0)
+      expect(subject.instance_variable_get '@epsilon').to eq(0.9)
     end
 
     it 'sets default value estimates for available actions' do

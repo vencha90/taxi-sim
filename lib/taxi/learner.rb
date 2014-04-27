@@ -4,8 +4,8 @@ module TaxiLearner
       attr_reader :value_estimates, :state, :visits
 
       DEFAULT_VALUE_ESTIMATE = 100
-      DISCOUNT_FACTOR = 0.1
-      EPSILON = 0
+      DISCOUNT_FACTOR = 0.9
+      EPSILON = 0.9
 
       def initialize(state:, 
                      available_actions:,

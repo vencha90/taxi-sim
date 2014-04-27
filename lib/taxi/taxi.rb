@@ -118,7 +118,6 @@ module TaxiLearner
     def log_params
       action_type = @action.nil? ? nil : @action.type
       { reward: @reward,
-        busy: busy?,
         location: @location,
         busy_for: @busy_for,
         action: action_type
