@@ -3,6 +3,8 @@ module TaxiLearner
     class Action
       attr_reader :type, :value, :units, :unit_cost
 
+      MINIMUM_COST = 1
+
       def initialize(type:, value: nil, units: 0, unit_cost: 0)
         @type = type
         @value = value
@@ -30,7 +32,7 @@ module TaxiLearner
         else
           cost = 0
         end
-        cost < 1 ? 1 : cost
+        cost < MINIMUM_COST ? MINIMUM_COST : cost
       end
     end
   end

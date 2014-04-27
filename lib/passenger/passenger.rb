@@ -3,7 +3,10 @@ module TaxiLearner
     include Logging
     attr_reader :destination, :location, :price, :world, :characteristics
 
-    def initialize(world:, location: nil, price: 1,
+    PRICE = 1
+    THRESHOLD = 1
+
+    def initialize(world:, location: nil, price: PRICE,
                    characteristics: default_characteristics)
       @world = world
       @location = location
@@ -13,7 +16,7 @@ module TaxiLearner
     end
 
     def accept_fare?(fare)
-      accept = 0.5 > ((expected_fare * probabilistic_value) / fare )
+      accept = THRESHOLD < ((expected_fare * probabilistic_value) / fare )
       str = accept ? 'accepted' : 'declined'
       write_log(passenger: str,
           fare: fare,

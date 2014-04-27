@@ -4,11 +4,12 @@ module TaxiLearner
     attr_reader :graph, :time, :passenger
 
     DEFAULT_BENCHMARK_PRICE = 10
+    TIME_LIMIT = 100000
 
     def initialize(graph:,
                    passenger_params:,
                    taxi_params:,
-                   time_limit: 100000)
+                   time_limit: TIME_LIMIT)
       @graph = graph
       @time = 0
       @time_limit = time_limit

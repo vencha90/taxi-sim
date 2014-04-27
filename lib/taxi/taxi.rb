@@ -3,12 +3,17 @@ module TaxiLearner
     include Logging
     attr_reader :fc, :vc, :prices, :reward, :action, :location, :passenger, :busy_for
 
+    FIXED_COST = 1
+    VARIABLE_COST = 1
+    PRICES = 1..20
+    DEFAULT_ACTION_LENGTH = 1
+
     def initialize(world:,
                    location:,
                    reachable_destinations:,
-                   fc: 1,
-                   vc: 1,
-                   prices: 1..20,
+                   fc: FIXED_COST,
+                   vc: VARIABLE_COST,
+                   prices: PRICES,
                    reward: 0,
                    learner: nil)
       @all_actions = []
@@ -69,7 +74,7 @@ module TaxiLearner
     end
 
     def process_action(location: , action:, passenger:)
-      action_length = 1
+      action_length = DEFAULT_ACTION_LENGTH
       learner_params = { busy_for: action_length }
       return learner_params if action.nil?
 
@@ -78,11 +83,11 @@ module TaxiLearner
         action_length = @world.distance(location, passenger.destination)
         learner_params = { reward: reward, location: passenger.destination }
       elsif action.type == :offer || action.type == :wait
-        action_length = 1
+        action_length = DEFAULT_ACTION_LENGTH
         learner_params = { reward: - @fc }
       elsif action.type == :drive
         action_length = @world.distance(location, action.value)
-        action_length = 1 if action_length < 1
+        action_length = DEFAULT_ACTION_LENGTH if action_length < DEFAULT_ACTION_LENGTH
         learner_params = { reward: - action.cost, location: action.value }
       end
       learner_params[:busy_for] = action_length
