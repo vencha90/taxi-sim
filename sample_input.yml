@@ -8,7 +8,7 @@ graph:
   - "2, 3, 1, 1, 0, 5"
   - "1, 0, 3, 0, 5, 0"
 passenger:
-  price: 20
+  price: 10
 taxi:
-  prices: '10..50'
+  prices: '5..100'
   benchmark_price: 20
