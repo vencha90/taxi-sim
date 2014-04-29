@@ -40,7 +40,4 @@ describe Runner do
       end
     end
   end
-
-  it 'runs a simulation'
-  it 'writes a log file'
 end

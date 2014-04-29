@@ -307,7 +307,7 @@ describe Taxi do
   end
 
   describe '#available_actions' do
-    let(:world) { double(distance: 'dist') }
+    let(:world) { double(distance: 1) }
 
     context 'without a set destination' do
       subject { Taxi.new(min_params.merge(
@@ -322,7 +322,7 @@ describe Taxi do
         expect(subject.available_actions
           ).to include(
             Taxi::Action.new(type: :wait, unit_cost: 11),
-            Taxi::Action.new(type: :drive, value: 'dest', units: 'dist', unit_cost: 33),
+            Taxi::Action.new(type: :drive, value: 'dest', units: 1, unit_cost: 33),
           )
       end
     end
@@ -339,11 +339,25 @@ describe Taxi do
       before { subject.instance_variable_set('@passenger', passenger) }
 
       it 'returns the right set of actions including offers' do
-          expect(subject.available_actions)
-            .to include(Taxi::Action.new(type: :wait, unit_cost: 11),
-                        Taxi::Action.new(type: :drive, value: 'dest', units: 'dist', unit_cost: 33),
-                        Taxi::Action.new(type: :offer, value: 10, unit_cost: 11),
-                        Taxi::Action.new(type: :offer, value: 20, unit_cost: 11))
+        expect(subject.available_actions)
+          .to include(Taxi::Action.new(type: :wait, unit_cost: 11),
+                      Taxi::Action.new(type: :drive, value: 'dest', units: 1, unit_cost: 33),
+                      Taxi::Action.new(type: :offer, value: 10, unit_cost: 11),
+                      Taxi::Action.new(type: :offer, value: 20, unit_cost: 11))
+      end
+
+      it 'sets price depending on distance' do
+        allow(world).to receive(:distance).and_return(2)
+        expect(subject.available_actions)
+          .to include(Taxi::Action.new(type: :offer, value: 20, unit_cost: 11),
+                      Taxi::Action.new(type: :offer, value: 40, unit_cost: 11))
+      end
+
+      it 'works with distance == 0' do
+        allow(world).to receive(:distance).and_return(0)
+        expect(subject.available_actions)
+          .to include(Taxi::Action.new(type: :offer, value: 10, unit_cost: 11),
+                      Taxi::Action.new(type: :offer, value: 20, unit_cost: 11))
       end
 
       it 'does not create duplicate actions' do

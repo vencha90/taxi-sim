@@ -77,7 +77,11 @@ module TaxiLearner
       end
       unless @passenger.nil? || @passenger.destination.nil?
         @prices.each do |price|
-          actions << find_or_create_action(type: :offer, value: price, unit_cost: @fc)
+          distance = @world.distance(@location, @passenger.destination)
+          distance = 1 if distance == 0
+          actions << find_or_create_action(type: :offer,
+                                           value: price * distance,
+                                           unit_cost: @fc)
         end
       end
       actions
