@@ -21,12 +21,16 @@ module TaxiLearner
 
       alias eql? ==
 
-      def cost
+      def cost(accepted: false)
         case @type
         when :wait
           cost = @unit_cost
         when :offer
-          cost = @unit_cost
+          if accepted
+            cost = @units * @unit_cost
+          else
+            cost = @unit_cost
+          end
         when :drive
           cost = @units * @unit_cost
         else

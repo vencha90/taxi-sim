@@ -81,6 +81,7 @@ module TaxiLearner
           distance = 1 if distance == 0
           actions << find_or_create_action(type: :offer,
                                            value: price * distance,
+                                           units: distance,
                                            unit_cost: @fc)
         end
       end
@@ -93,7 +94,7 @@ module TaxiLearner
       return learner_params if action.nil?
 
       if action.type == :offer && passenger && passenger.accept_fare?(action.value)
-        reward = action.value - action.cost
+        reward = action.value - action.cost(accepted: true)
         action_length = @world.distance(location, passenger.destination)
         learner_params = { reward: reward, location: passenger.destination }
       elsif action.type == :offer || action.type == :wait

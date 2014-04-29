@@ -64,9 +64,13 @@ describe Taxi::Action do
     end
 
     context 'for offering' do
-      subject { Taxi::Action.new(type: :offer, unit_cost: 11) }
+      subject { Taxi::Action.new(type: :offer, units: 2, unit_cost: 11) }
       it 'uses a single time unit in calculations' do
         expect(subject.cost).to eq(11)
+      end
+
+      it 'equals time * distance when accepted (value * unit cost)' do
+        expect(subject.cost(accepted: true)).to eq(22)
       end
     end
 
