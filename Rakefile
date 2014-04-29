@@ -7,6 +7,7 @@ task :run, [:path] do |t, args|
   if args.path.nil? || args.path.strip.nil?
     puts "please specify a path by adding [path/to/some/file]"
   else
+    puts "running simulation with the inputs from '#{args.path}'"
     ruby "bin/taxi_learner #{args.path}"
     puts 'Task completed. Please see log files for results'
   end
