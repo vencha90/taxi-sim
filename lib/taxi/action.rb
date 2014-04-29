@@ -1,22 +1,24 @@
 module TaxiLearner
   class Taxi
     class Action
-      attr_reader :type, :value, :units, :unit_cost
+      attr_reader :type, :value, :units, :fc, :vc
 
       MINIMUM_COST = 1
 
-      def initialize(type:, value: nil, units: 0, unit_cost: 0)
+      def initialize(type:, value: nil, units: 0, fc: 0, vc: 0)
         @type = type
         @value = value
         @units = units
-        @unit_cost = unit_cost
+        @fc = fc
+        @vc = vc
       end
 
       def == (other)
         @type == other.type && 
           @value == other.value && 
           @units == other.units &&
-          @unit_cost == other.unit_cost
+          @fc == other.fc &&
+          @vc == other.vc
       end
 
       alias eql? ==
@@ -24,15 +26,15 @@ module TaxiLearner
       def cost(accepted: false)
         case @type
         when :wait
-          cost = @unit_cost
+          cost = @fc
         when :offer
           if accepted
-            cost = @units * @unit_cost
+            cost = @units * (@fc + @vc)
           else
-            cost = @unit_cost
+            cost = @fc
           end
         when :drive
-          cost = @units * @unit_cost
+          cost = @units * (@fc + @vc)
         else
           cost = 0
         end

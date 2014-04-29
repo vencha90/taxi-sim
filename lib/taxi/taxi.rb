@@ -67,13 +67,14 @@ module TaxiLearner
     end
 
     def available_actions
-      actions = [find_or_create_action(type: :wait, unit_cost: @fc)]
+      actions = [find_or_create_action(type: :wait, fc: @fc, vc: @vc)]
       @reachable_destinations.each do |destination|
         distance = @world.distance(@location, destination)
-        actions << find_or_create_action(type: :drive, 
+        actions << find_or_create_action(type: :drive,
                                     value: destination,
                                     units: distance,
-                                    unit_cost: @fc + @vc)
+                                    fc: @fc,
+                                    vc: @vc)
       end
       unless @passenger.nil? || @passenger.destination.nil?
         @prices.each do |price|
@@ -82,7 +83,8 @@ module TaxiLearner
           actions << find_or_create_action(type: :offer,
                                            value: price * distance,
                                            units: distance,
-                                           unit_cost: @fc)
+                                           fc: @fc,
+                                           vc: @vc)
         end
       end
       actions

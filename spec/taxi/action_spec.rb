@@ -14,25 +14,32 @@ describe Taxi::Action do
       expect(subject.new(type: nil, units: 'dist').units).to eq('dist')
     end
 
-    it 'assigns unit cost' do
-      expect(subject.new(type: nil, unit_cost: 'cost').unit_cost).to eq('cost')
+    it 'assigns fixed cost' do
+      expect(subject.new(type: nil, fc: 'cost').fc).to eq('cost')
     end
+
+    it 'assigns variable cost' do
+      expect(subject.new(type: nil, vc: 'cost').vc).to eq('cost')
+    end
+
   end
 
   describe '#==' do
-    subject { Taxi::Action.new(type: 'type', value: 'value', units: 'units', unit_cost: 'cost') }
-    let(:equal_action) { Taxi::Action.new(type: 'type', value: 'value', units: 'units', unit_cost: 'cost') }
+    subject { Taxi::Action.new(type: 'type', value: 'value', units: 'units', fc: 'cost', vc: 'vc') }
+    let(:equal_action) { Taxi::Action.new(type: 'type', value: 'value', units: 'units', fc: 'cost', vc: 'vc') }
     let(:another_type) { Taxi::Action.new(type: 'another type') }
     let(:another_value) { Taxi::Action.new(type: 'type', value: 'value222') }
     let(:another_distance) { Taxi::Action.new(type: 'type', value: 'value', units: 'units222')}
-    let(:another_cost) { Taxi::Action.new(type: 'type', value: 'value', units: 'units', unit_cost: 'cost222')}
+    let(:another_fc) { Taxi::Action.new(type: 'type', value: 'value', units: 'units', fc: 'cost222')}
+    let(:another_vc) { Taxi::Action.new(type: 'type', value: 'value', units: 'units', fc: 'cost', vc: 'other')}
 
-    it 'compares types and values and distances' do
+    it 'compares types and values and distances and costs' do
       expect(subject).to eq(equal_action)
       expect(subject).not_to eq(another_type)
       expect(subject).not_to eq(another_value)
       expect(subject).not_to eq(another_distance)
-      expect(subject).not_to eq(another_cost)
+      expect(subject).not_to eq(another_fc)
+      expect(subject).not_to eq(another_vc)
     end
   end
 
@@ -46,7 +53,7 @@ describe Taxi::Action do
     its(:cost) { should eq(1) }
 
     context 'for waiting' do
-      subject { Taxi::Action.new(type: :wait, unit_cost: 12) }
+      subject { Taxi::Action.new(type: :wait, fc: 12, vc: 4) }
 
       it 'uses a single time unit in calculations' do
         expect(subject.cost).to eq(12)
@@ -57,25 +64,26 @@ describe Taxi::Action do
       subject { Taxi::Action.new(type: :drive, 
                                  value: 'destination',
                                  units: 2,
-                                 unit_cost: 12) }
+                                 fc: 12,
+                                 vc: 2) }
       it 'uses units in calculations' do
-        expect(subject.cost).to eq(24)
+        expect(subject.cost).to eq(28)
       end
     end
 
     context 'for offering' do
-      subject { Taxi::Action.new(type: :offer, units: 2, unit_cost: 11) }
+      subject { Taxi::Action.new(type: :offer, units: 2, fc: 11, vc: 2) }
       it 'uses a single time unit in calculations' do
         expect(subject.cost).to eq(11)
       end
 
       it 'equals time * distance when accepted (value * unit cost)' do
-        expect(subject.cost(accepted: true)).to eq(22)
+        expect(subject.cost(accepted: true)).to eq(26)
       end
     end
 
     it 'cannot be lower than 1' do
-      expect(Taxi::Action.new(type: :offer, unit_cost: 0).cost).to eq(1)
+      expect(Taxi::Action.new(type: :offer, fc: 0, vc: 0).cost).to eq(1)
     end
   end
 end

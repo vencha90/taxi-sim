@@ -321,8 +321,8 @@ describe Taxi do
       it 'returns the right set of actions - only driving and waiting' do
         expect(subject.available_actions
           ).to include(
-            Taxi::Action.new(type: :wait, unit_cost: 11),
-            Taxi::Action.new(type: :drive, value: 'dest', units: 1, unit_cost: 33),
+            Taxi::Action.new(type: :wait, fc: 11, vc: 22),
+            Taxi::Action.new(type: :drive, value: 'dest', units: 1, fc: 11, vc: 22 ),
           )
       end
     end
@@ -340,24 +340,24 @@ describe Taxi do
 
       it 'returns the right set of actions including offers' do
         expect(subject.available_actions)
-          .to include(Taxi::Action.new(type: :wait, unit_cost: 11),
-                      Taxi::Action.new(type: :drive, value: 'dest', units: 1, unit_cost: 33),
-                      Taxi::Action.new(type: :offer, value: 10, units: 1, unit_cost: 11),
-                      Taxi::Action.new(type: :offer, value: 20, units: 1, unit_cost: 11))
+          .to include(Taxi::Action.new(type: :wait, fc: 11, vc: 22),
+                      Taxi::Action.new(type: :drive, value: 'dest', units: 1, fc: 11, vc: 22),
+                      Taxi::Action.new(type: :offer, value: 10, units: 1, fc: 11, vc: 22),
+                      Taxi::Action.new(type: :offer, value: 20, units: 1, fc: 11, vc: 22))
       end
 
       it 'sets price depending on distance' do
         allow(world).to receive(:distance).and_return(2)
         expect(subject.available_actions)
-          .to include(Taxi::Action.new(type: :offer, value: 20, units: 2, unit_cost: 11),
-                      Taxi::Action.new(type: :offer, value: 40, units: 2, unit_cost: 11))
+          .to include(Taxi::Action.new(type: :offer, value: 20, units: 2, fc: 11, vc: 22),
+                      Taxi::Action.new(type: :offer, value: 40, units: 2, fc: 11, vc: 22))
       end
 
       it 'works with distance == 0' do
         allow(world).to receive(:distance).and_return(0)
         expect(subject.available_actions)
-          .to include(Taxi::Action.new(type: :offer, value: 10, units: 1, unit_cost: 11),
-                      Taxi::Action.new(type: :offer, value: 20, units: 1, unit_cost: 11))
+          .to include(Taxi::Action.new(type: :offer, value: 10, units: 1, fc: 11, vc:22),
+                      Taxi::Action.new(type: :offer, value: 20, units: 1, fc: 11, vc:22))
       end
 
       it 'does not create duplicate actions' do
