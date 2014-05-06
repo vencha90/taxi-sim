@@ -32,6 +32,7 @@ module TaxiLearner
     def tick
       @passenger = set_new_passenger(@taxi.location)
       @taxi.act(@passenger)
+      write_newline
 
       @time += 1
       write_log(time: @time)

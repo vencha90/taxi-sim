@@ -11,7 +11,11 @@ module TaxiLearner
     end
 
     def write_log(**args)
-      logger.puts(process_args args)
+      logger.print(process_args args)
+    end
+
+    def write_newline
+      logger.puts
     end
 
     def write_summary(**args)
