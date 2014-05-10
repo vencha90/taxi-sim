@@ -21,7 +21,6 @@ module TaxiLearner
       str = accept ? 'accepted' : 'declined'
       write_log(passenger: str,
           fare: fare,
-          location: @location,
           destination: @destination)
       accept
     end
