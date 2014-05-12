@@ -1,17 +1,53 @@
-## taxi-sim
+## Taxi-sim
 ### Q-Learner simulation for taxi markets with no price regulation
-========
-Requires [Ruby](https://www.ruby-lang.org/en/) and [rubygems](https://rubygems.org/). 
+------------------
+A final year undergraduate project for the degree of BSc (Honours) in Computing Science (Business Computing) at the [Department of Computing Science] of the [University of Aberdeen].
 
-See [Gemfile](Gemfile) for the exact required ruby version and software dependencies.
+TODO! Please see the [Report] for a project abstract and a detailed description of the project. Included in the report but also available separately are:
 
-Run `bundle install` to install gem depencencies, then `bundle exec rake -T` in command line to see a list of the accepted commands.
+- TODO! a [User Manual] for instructions on basic usage of the software,
+- TODO! a [Maintenance Manual] for instructions on advanced usage and development help.
 
-See [this sample file](sample_input.yml) for all of the currently accepted input data.
+The results of the experiments are available here: [Result Dataset]
 
-When the simulation is finished (could take a while depending on the time limit), see files in `logs/` for output data.
+### Software Dependencies
+-------------------------
 
-==========
+I recommend you to use automatically provisioned virtualisation as specified in the User Manual. Alternatively, on supported Unix-like systems you can use [RVM] or [rbenv].
+
+Uses [Ruby] version 2.1.1
+
+Uses [Rubygems] version 2.2.2
+
+Please see [Gemfile] for the top level depencencies and [Gemfile.lock] for a full list of all dependencies.
+
+### Data Analysis
+-----------------
+
+You can use [R Language] for data analysis. An R script [analysis.R] is included with the project.
+
+
+-----------------------
+
 Copyright © 2014 Karlis Venters
 
 See [licensing information here](LICENSE.md)
+
+This file is in [Markdown]
+
+[analysis.R]: (analysis.R) 
+[Gemfile]: (Gemfile)
+[Gemfile.lock]: (Gemfile.lock)
+[Maintenance Manual]: Maintenance_Manual.pdf
+[Report]: Report.pdf
+[User Manual]: User_Manual.pdf
+
+[Department of Computing Science]: http://www.abdn.ac.uk/ncs/departments/computing-science
+[Markdown]: http://daringfireball.net/projects/markdown/
+[rbenv]: https://github.com/sstephenson/rbenv
+[Result Dataset]: https://db.tt/zYPt09CL
+[R Language]: http://www.r-project.org/
+[Ruby]: https://www.ruby-lang.org/en/
+[Rubygems]: http://rubygems.org/
+[RVM]: http://rvm.io/
+[University of Aberdeen]: http://abdn.ac.uk/
