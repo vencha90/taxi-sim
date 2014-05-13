@@ -35,13 +35,14 @@ describe Taxi do
     end
 
     context 'instantiates learner' do
-      subject { Taxi.new(min_params.merge(learner: nil)) }
+      subject { Taxi.new(min_params.merge(learner: nil, learner_params: 'learner params')) }
       it 'includes available actions' do
         allow_any_instance_of(Taxi
           ).to receive(:available_actions
           ).and_return([1, 2, 3])
         expect(Taxi::Learner).to receive(:new) do |args|
           expect(args[:available_actions]).to include(1, 2, 3)
+          expect(args[:params]).to eq('learner params')
         end
         subject
       end

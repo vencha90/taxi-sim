@@ -136,6 +136,23 @@ describe FileParser do
           expect(subject.taxi('taxi' => {})).to_not have_key(:benchamark_price)
         end
       end
+
+      context 'learner parameters' do
+        it 'parses value estimate' do
+          expect(subject.taxi('taxi' => { 'learner' => { 'default_value_estimate' => '12'}}))
+            .to eq(learner_params: { default_value_estimate: 12 })
+        end
+
+        it 'parses epsilon greediness factor' do
+          expect(subject.taxi('taxi' => { 'learner' => { 'epsilon' => '1.2'}}))
+            .to eq(learner_params: { epsilon: 1.2 })
+        end
+
+        it 'parses discount factor' do
+          expect(subject.taxi('taxi' => { 'learner' => { 'discount' => '1.2'}}))
+            .to eq(learner_params: { discount: 1.2 })
+        end
+      end
     end
   end
 end

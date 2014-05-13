@@ -38,10 +38,19 @@ module TaxiLearner
       params[:prices] = prices unless prices.nil?
       benchmark_price = parse_benchmark_price(taxi_params['benchmark_price'])
       params[:benchmark_price] = benchmark_price unless benchmark_price.nil?
+      params[:learner_params] = learner_params(taxi_params['learner']) unless taxi_params['learner'].nil?
       params
     end
 
   private
+    def learner_params(input)
+      params = {}
+      params[:default_value_estimate] = input['default_value_estimate'].to_i if input['default_value_estimate']
+      params[:epsilon] = input['epsilon'].to_f if input['epsilon']
+      params[:discount] = input['discount'].to_f if input['discount']
+      params
+    end
+
     def parse_prices(input)
       return nil if input.nil? || input.empty?
       if input.include?('..')

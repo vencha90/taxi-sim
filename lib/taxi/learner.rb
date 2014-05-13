@@ -3,20 +3,20 @@ module TaxiLearner
     class Learner
       attr_reader :value_estimates, :state, :visits
 
-      DEFAULT_VALUE_ESTIMATE = 100
+      DEFAULT_VALUE_ESTIMATE = 0
       DISCOUNT_FACTOR = 0.9
       EPSILON = 0.9
 
       def initialize(state:, 
                      available_actions:,
-                     discount_factor: DISCOUNT_FACTOR,
                      step_size_function: nil,
                      value_estimates: {},
-                     epsilon: EPSILON)
-        @discount_factor = discount_factor
+                     params: {})
         @state = state
         @visits = { @state => Hash.new }
-        @epsilon = epsilon
+        @epsilon = params[:epsilon] || EPSILON
+        @initial_value_estimate = params[:default_value_estimate] || DEFAULT_VALUE_ESTIMATE
+        @discount_factor = params[:discount] || DISCOUNT_FACTOR
 
         @step_size_function = step_size_function || default_step_size_function
         @value_estimates = value_estimates
@@ -82,7 +82,7 @@ module TaxiLearner
         @value_estimates[state] ||= Hash.new
         actions.each do |action|
           unless @value_estimates[state].has_key?(action)
-            @value_estimates[state][action] = DEFAULT_VALUE_ESTIMATE
+            @value_estimates[state][action] = @initial_value_estimate
           end
         end
       end

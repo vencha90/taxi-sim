@@ -5,7 +5,8 @@ describe World do
                        distance: nil) }
   let(:passenger_params) { {price: 99} }
   let(:taxi_params) {{ prices: 12..34,
-                       benchmark_price: 66 }}
+                       benchmark_price: 66,
+                       learner_params: 'learner' }}
   subject { World.new(graph: graph, 
                       passenger_params: passenger_params,
                       taxi_params: taxi_params) }

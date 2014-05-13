@@ -59,6 +59,8 @@ module TaxiLearner
                  location: location,
                  reachable_destinations: @graph.vertices }
       prices = @taxi_params[:prices]
+      learner_params = @taxi_params[:learner_params]
+      params.merge!({prices: prices}) unless prices.nil?
       params.merge({prices: prices}) unless prices.nil?
     end
 

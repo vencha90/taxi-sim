@@ -19,7 +19,7 @@ describe Taxi::Learner do
     end
 
     it 'sets default value estimates for available actions' do
-      expect(subject.value_estimates).to eq(2 => {'action' => 100})
+      expect(subject.value_estimates).to eq(2 => {'action' => 0})
     end
 
     it 'sets a default step size function' do
@@ -28,11 +28,30 @@ describe Taxi::Learner do
       expect(function.call 2, 2).to eq(0.5)
       expect(function.call 0, 0).to eq(1)
     end
+
+    context 'parameters' do
+      let(:additional_params) { {discount: 0.5,
+                                 epsilon: 0.4,
+                                 default_value_estimate: 123} }
+      subject { Taxi::Learner.new(min_params.merge(params: additional_params))}
+
+      it 'sets a default discount factor' do
+        expect(subject.instance_variable_get '@discount_factor').to eq(0.5)
+      end
+
+      it 'sets epsilon to use random actions' do
+        expect(subject.instance_variable_get '@epsilon').to eq(0.4)
+      end
+
+      it 'sets default value estimates for available actions' do
+        expect(subject.value_estimates).to eq(2 => {'action' => 123})
+      end
+    end
   end
 
   describe '#update!' do
     subject { Taxi::Learner.new(state: 0,
-      discount_factor: 0.2,
+      params: {discount_factor: 0.2},
       step_size_function: double(call: 0.5),
       value_estimates: { 0 => {'action' => 0.5, 'other_action' => 1.0},
                          1 => {'action' => 0.5},
@@ -46,7 +65,7 @@ describe Taxi::Learner do
     it 'updates value estimates correctly' do
       expect{ update!
         }.to change{ subject.value_estimates[0]['action'] }.from(0.5)
-        .to be_within(0.000001).of(0.55)
+        .to be_within(0.000001).of(0.725)
     end
 
     it 'updates visits of old state' do
@@ -78,7 +97,7 @@ describe Taxi::Learner do
       expect{ act! 
         }.to change{ subject.value_estimates['new state'] }
          .from(nil)
-         .to eq('action' => 100)
+         .to eq('action' => 0)
     end
 
     it 'chooses an action' do

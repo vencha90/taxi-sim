@@ -12,3 +12,7 @@ passenger:
 taxi:
   prices: '5..100'
   benchmark_price: 20
+  learner:
+    default_value_estimate: 0
+    epsilon: 0.9
+    discount: 0.9

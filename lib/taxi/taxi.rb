@@ -23,7 +23,8 @@ module TaxiLearner
                    vc: VARIABLE_COST,
                    prices: PRICES,
                    reward: 0,
-                   learner: nil)
+                   learner: nil,
+                   learner_params: {})
       @all_actions = []
       @all_states = []
       @busy_for = 0
@@ -40,7 +41,8 @@ module TaxiLearner
       @reward = reward
 
       @learner = learner || Taxi::Learner.new(state: set_state(@location),
-                                    available_actions: available_actions)
+                                    available_actions: available_actions,
+                                    params: learner_params)
       write_summary(fc: @fc, vc: @vc, prices: @prices)
     end
 
