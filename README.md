@@ -3,10 +3,10 @@
 ------------------
 A final year undergraduate project for the degree of BSc (Honours) in Computing Science (Business Computing) at the [Department of Computing Science] of the [University of Aberdeen].
 
-TODO! Please see the [Report] for a project abstract and a detailed description of the project. Included in the report but also available separately are:
+Please see the [Report] for a project abstract and a detailed description of the project. Included in the report but also available separately are:
 
-- TODO! a [User Manual] for instructions on basic usage of the software,
-- TODO! a [Maintenance Manual] for instructions on advanced usage and development help.
+- a [User Manual] for instructions on basic usage of the software,
+- a [Maintenance Manual] for instructions on advanced usage and development help.
 
 The results of the experiments are available here: [Result Dataset]
 
@@ -24,7 +24,7 @@ Please see [Gemfile] for the top level depencencies and [Gemfile.lock] for a ful
 ### Data Analysis
 -----------------
 
-You can use [R Language] for data analysis. An R script [analysis.R] is included with the project.
+You can use [R Language] for data analysis. An R script [analysis.R] is included with the project. For instructions, please see the [User Manual]
 
 
 -----------------------
